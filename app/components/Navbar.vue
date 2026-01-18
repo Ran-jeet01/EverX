@@ -27,265 +27,67 @@ watch(() => route.path, close);
 </script>
 
 <template>
-  <header :class="['navbar', { solid: solidNav }]">
-    <div class="container navbar-content">
+  <header
+    class="fixed top-0 left-0 w-full h-[var(--header-height)] z-[1000] transition-all duration-300 flex items-center text-white"
+    :class="solidNav ? 'bg-black/75 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.15)]' : 'bg-transparent'"
+  >
+    <div class="container flex justify-between md:grid md:grid-cols-[1fr_auto_1fr] items-center w-full">
       <!-- Left side  Store and Product -->
-      <div class="nav-left">
-        <NuxtLink to="/" class="nav-link">Store</NuxtLink>
-        <NuxtLink to="/products" class="nav-link">Product</NuxtLink>
+      <div class="hidden md:flex gap-8 justify-start">
+        <NuxtLink to="/" class="font-medium text-white uppercase text-base opacity-90 tracking-wide relative transition-opacity hover:opacity-100">Store</NuxtLink>
+        <NuxtLink to="/products" class="font-medium text-white uppercase text-base opacity-90 tracking-wide relative transition-opacity hover:opacity-100">Product</NuxtLink>
       </div>
 
       <!-- Center side onlyy Logo -->
-      <NuxtLink to="/" class="logo">
+      <NuxtLink to="/" class="text-2xl text-white flex items-center justify-center gap-2">
         Ever
-        <img src="~/assets/khu.png" class="icon" alt="Ever logo" />
+        <img src="~/assets/khu.png" class="h-[38px] w-auto" alt="Ever logo" />
       </NuxtLink>
 
       <!-- Right side  About and Cart) -->
-      <div class="nav-right">
-        <NuxtLink to="/about" class="nav-link">About Us</NuxtLink>
-        <NuxtLink to="/cart" class="nav-link cart-link">
+      <div class="flex gap-8 justify-end items-center">
+        <NuxtLink to="/about" class="hidden md:block font-medium text-white uppercase text-base opacity-90 tracking-wide relative transition-opacity hover:opacity-100">About Us</NuxtLink>
+        <NuxtLink to="/cart" class="hidden md:block font-medium text-white uppercase text-base opacity-90 tracking-wide relative transition-opacity hover:opacity-100 relative">
           Cart
-          <span v-if="count > 0" class="cart-badge-count">{{ count }}</span>
+          <span v-if="count > 0" class="absolute -top-2 -right-3 min-w-[18px] h-[18px] bg-error rounded-full text-white text-[0.7rem] font-bold flex items-center justify-center px-1">{{ count }}</span>
         </NuxtLink>
 
         <button
-          class="mobile-menu-btn"
+          class="block md:hidden text-2xl bg-transparent text-white border-none cursor-pointer"
           @click="toggle"
           aria-label="Toggle menu"
         >
           <Icon name="ri:menu-4-line" size="24" />
-
-          <i class="ri-"></i>
         </button>
       </div>
     </div>
   </header>
 
   <!-- Mobile Sidebar -->
-  <aside :class="['mobile-sidebar', { active: open }]">
-    <div class="sidebar-header">
-      <button class="close-btn" @click="close" aria-label="Close menu">
+  <aside
+    class="fixed top-0 w-[300px] h-screen bg-[#1a1a1a] z-[2000] transition-all duration-300 p-8 flex flex-col gap-8 shadow-[-5px_0_15px_rgba(0,0,0,0.5)]"
+    :class="open ? 'right-0' : '-right-[300px]'"
+  >
+    <div class="flex justify-end">
+      <button class="bg-transparent border-none text-white text-3xl cursor-pointer" @click="close" aria-label="Close menu">
         <Icon name="ri:close-line" size="24" />
-        <!-- <Icon icon="ri-menu-4-line" width="24" height="24" /> -->
       </button>
     </div>
 
-    <div class="sidebar-links">
-      <NuxtLink to="/" class="sidebar-link" @click="close">Store</NuxtLink>
-      <NuxtLink to="/products" class="sidebar-link" @click="close"
+    <div class="flex flex-col gap-6">
+      <NuxtLink to="/" class="text-white no-underline text-xl uppercase tracking-widest transition-colors flex items-center gap-2.5 hover:text-primary" @click="close">Store</NuxtLink>
+      <NuxtLink to="/products" class="text-white no-underline text-xl uppercase tracking-widest transition-colors flex items-center gap-2.5 hover:text-primary" @click="close"
         >Product</NuxtLink
       >
-      <NuxtLink to="/about" class="sidebar-link" @click="close"
+      <NuxtLink to="/about" class="text-white no-underline text-xl uppercase tracking-widest transition-colors flex items-center gap-2.5 hover:text-primary" @click="close"
         >About Us</NuxtLink
       >
-      <NuxtLink to="/cart" class="sidebar-link" @click="close">
+      <NuxtLink to="/cart" class="text-white no-underline text-xl uppercase tracking-widest transition-colors flex items-center gap-2.5 hover:text-primary" @click="close">
         Cart <span v-if="count > 0">({{ count }})</span>
       </NuxtLink>
     </div>
   </aside>
 
   <!-- Backdrop -->
-  <div v-if="open" class="sidebar-backdrop" @click="close" />
+  <div v-if="open" class="fixed inset-0 bg-black/50 z-[1500]" @click="close" />
 </template>
-
-<style scoped>
-.icon {
-  height: 38px;
-  width: auto;
-}
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: var(--header-height);
-  background: transparent;
-  z-index: 1000;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  color: white;
-}
-.navbar.solid {
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.navbar-content {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  width: 100%;
-}
-
-.nav-left {
-  display: flex;
-  gap: 2rem;
-  justify-content: flex-start;
-}
-
-.nav-center {
-  display: flex;
-  justify-content: center;
-}
-
-.nav-right {
-  display: flex;
-  gap: 2rem;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-.logo {
-  font-size: 2rem;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.nav-link {
-  font-weight: 500;
-  color: white;
-  text-transform: uppercase;
-  font-size: 0.9rem;
-  opacity: 0.9;
-  letter-spacing: 0.5px;
-  position: relative;
-  transition: opacity 0.3s;
-}
-
-.nav-link:hover {
-  opacity: 1;
-}
-
-.cart-link {
-  position: relative;
-}
-.cart-badge-count {
-  position: absolute;
-  top: -8px;
-  right: -12px;
-  min-width: 18px;
-  height: 18px;
-  background-color: var(--error-color, red);
-  border-radius: 99px;
-  color: white;
-  font-size: 0.7rem;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 4px;
-}
-.cart-badge-dot {
-  position: absolute;
-  top: -2px;
-  right: -6px;
-  width: 6px;
-  height: 6px;
-  background-color: var(--error-color, red);
-  border-radius: 50%;
-}
-
-.mobile-menu-btn {
-  display: none;
-  font-size: 1.5rem;
-  background: transparent;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-@media (max-width: 768px) {
-  .navbar-content {
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .nav-left,
-  .nav-right > .nav-link {
-    display: none;
-  }
-
-  .mobile-menu-btn {
-    display: block;
-  }
-}
-
-/* Sidebar Styles */
-.mobile-sidebar {
-  position: fixed;
-  top: 0;
-  right: -300px;
-  width: 300px;
-  height: 100vh;
-  background-color: #1a1a1a;
-  z-index: 2000;
-  transition: right 0.3s ease-in-out;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
-}
-
-.mobile-sidebar.active {
-  right: 0;
-}
-
-.sidebar-header {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.close-btn {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 2rem;
-  cursor: pointer;
-}
-
-.sidebar-links {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.sidebar-link {
-  color: white;
-  text-decoration: none;
-  font-size: 1.2rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: color 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.sidebar-link:hover {
-  color: var(--primary-color, #4caf50);
-}
-
-.sidebar-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1500;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease-in-out;
-}
-
-.sidebar-backdrop.active {
-  opacity: 1;
-  visibility: visible;
-}
-</style>

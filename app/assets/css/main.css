@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary-color: #0f172a;
+    --secondary-color: #334155;
+    --accent-color: #6366f1;
+    --accent-hover: #4f46e5;
+    --background-color: #f8fafc;
+    --surface-color: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --success-color: #10b981;
+    --error-color: #ef4444;
+    --color-primary: var(--primary-color);
+
+    --gradient-main: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+
+    --font-family: "Outfit", sans-serif;
+
+    --container-width: 1280px;
+    --header-height: 80px;
+
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+  }
+
+  body {
+    @apply font-outfit bg-background text-text-primary antialiased leading-relaxed;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-container mx-auto px-6;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 font-semibold rounded-full transition-all duration-300 gap-2 cursor-pointer border-none outline-none;
+    font-family: inherit;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white;
+  }
+
+  .btn-primary:hover {
+    @apply bg-secondary -translate-y-0.5 shadow-lg;
+  }
+
+  .btn-accent {
+    @apply text-white;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  }
+
+  .btn-accent:hover {
+    @apply brightness-110 -translate-y-0.5 shadow-lg;
+  }
+
+  .section-title {
+    @apply text-4xl font-bold text-center mb-4 text-primary;
+  }
+
+  .section-subtitle {
+    @apply text-center text-text-secondary text-lg mb-12 max-w-[600px] mx-auto;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

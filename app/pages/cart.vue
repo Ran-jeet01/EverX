@@ -21,32 +21,32 @@ const decreaseQuantity = cartStore.decreaseQuantity;
   <div v-if="cartItems.length === 0">
     <EmptyCart />
   </div>
-  <div v-else class="page-container container main-padding">
+  <div v-else class="page-container container pt-[calc(var(--header-height)+2rem)]">
     <h1 class="section-title">Your Cart</h1>
-    <div class="cart-layout">
-      <div class="cart-items">
-        <div v-for="item in cartItems" :key="item.title" class="cart-item">
-          <div class="cart-item-img-box">
-            <img :src="item.image" :alt="item.title" />
+    <div class="grid grid-cols-1 md:grid-cols-[1fr_350px] gap-12 mt-8">
+      <div class="flex flex-col gap-6">
+        <div v-for="item in cartItems" :key="item.title" class="flex gap-6 pb-6 border-b border-slate-200">
+          <div class="w-[120px] h-[120px] shrink-0 bg-slate-50">
+            <img :src="item.image" :alt="item.title" class="w-full h-full object-cover" />
           </div>
 
-          <div class="cart-item-info">
+          <div class="grow flex flex-col justify-between">
             <div class="item-header">
-              <h3>{{ item.title }}</h3>
-              <p class="item-price">{{ item.price }}</p>
+              <h3 class="text-lg font-semibold mb-1">{{ item.title }}</h3>
+              <p class="text-slate-500 font-mono font-semibold">{{ item.price }}</p>
             </div>
 
-            <div class="item-actions">
-              <div class="quantity-controls">
-                <button class="qty-btn" @click="decreaseQuantity(item.id)">
+            <div class="flex justify-between items-center mt-4">
+              <div class="flex items-center border border-slate-200">
+                <button class="w-8 h-8 flex items-center justify-center bg-white border-none cursor-pointer text-slate-600 transition-all duration-200 hover:bg-slate-50 hover:text-black" @click="decreaseQuantity(item.id)">
                   <Icon name="ri:subtract-line" size="24" />
                 </button>
-                <span class="qty-display">{{ item.quantity }}</span>
-                <button class="qty-btn" @click="increaseQuantity(item.id)">
+                <span class="w-10 text-center text-sm font-medium">{{ item.quantity }}</span>
+                <button class="w-8 h-8 flex items-center justify-center bg-white border-none cursor-pointer text-slate-600 transition-all duration-200 hover:bg-slate-50 hover:text-black" @click="increaseQuantity(item.id)">
                   <Icon name="ri:add-line" size="24" />
                 </button>
               </div>
-              <button class="remove-btn" @click="removeFromCart(item.id)">
+              <button class="bg-transparent border-none text-red-500 text-sm cursor-pointer underline p-0 hover:text-red-600" @click="removeFromCart(item.id)">
                 Remove
               </button>
             </div>
@@ -54,19 +54,19 @@ const decreaseQuantity = cartStore.decreaseQuantity;
         </div>
       </div>
 
-      <div class="cart-summary">
-        <h2>Order Summary</h2>
-        <div class="summary-row">
+      <div class="bg-slate-50 p-8 h-fit border border-slate-200">
+        <h2 class="text-xl font-bold mb-6 pb-4 border-b border-slate-200">Order Summary</h2>
+        <div class="flex justify-between mb-4 text-slate-600">
           <span>Total Product</span>
           <span>{{ cartItems.length }}</span>
         </div>
-        <div class="summary-row total">
+        <div class="flex justify-between mb-4 text-slate-600 mt-4 pt-4 border-t border-slate-200 font-bold text-black text-lg">
           <span>Total</span>
           <span>${{ cartStore.totalPrice }}</span>
         </div>
         <button
           @click="cartStore.clearCart"
-          class="btn btn-primary checkout-btn"
+          class="btn btn-primary w-full mt-6 flex justify-center"
         >
           Proceed to Checkout
         </button>
@@ -74,158 +74,3 @@ const decreaseQuantity = cartStore.decreaseQuantity;
     </div>
   </div>
 </template>
-
-<style scoped>
-.main-padding {
-  padding-top: calc(var(--header-height) + 2rem);
-}
-
-.cart-layout {
-  display: grid;
-  grid-template-columns: 1fr 350px;
-  gap: 3rem;
-  margin-top: 2rem;
-}
-
-.cart-items {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.cart-item {
-  display: flex;
-  gap: 1.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.cart-item-img-box {
-  width: 120px;
-  height: 120px;
-  flex-shrink: 0;
-  background: #f1f5f9;
-}
-
-.cart-item-img-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.cart-item-info {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.item-header h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
-
-.item-price {
-  color: #64748b;
-  font-family: monospace;
-  font-weight: 600;
-}
-
-.item-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 1rem;
-}
-
-.quantity-controls {
-  display: flex;
-  align-items: center;
-  border: 1px solid #e2e8f0;
-}
-
-.qty-btn {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  border: none;
-  cursor: pointer;
-  color: #475569;
-  transition: all 0.2s;
-}
-
-.qty-btn:hover {
-  background: #f8fafc;
-  color: black;
-}
-
-.qty-display {
-  width: 40px;
-  text-align: center;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.remove-btn {
-  background: none;
-  border: none;
-  color: #ef4444;
-  font-size: 0.85rem;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
-}
-
-.remove-btn:hover {
-  color: #dc2626;
-}
-
-/* Summary */
-.cart-summary {
-  background: #f8fafc;
-  padding: 2rem;
-  height: fit-content;
-  border: 1px solid #e2e8f0;
-}
-
-.cart-summary h2 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-  color: #475569;
-}
-
-.summary-row.total {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
-  font-weight: 700;
-  color: black;
-  font-size: 1.1rem;
-}
-
-.checkout-btn {
-  width: 100%;
-  margin-top: 1.5rem;
-  display: flex;
-  justify-content: center;
-}
-
-@media (max-width: 768px) {
-  .cart-layout {
-    grid-template-columns: 1fr;
-  }
-}
-</style>

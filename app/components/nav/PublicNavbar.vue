@@ -57,7 +57,7 @@ watch(() => route.path, close);
         to="/"
         class="text-2xl text-white flex items-center justify-center gap-2"
       >
-        Ever def
+        Ever
         <img src="~/assets/khu.png" class="h-[38px] w-auto" alt="Ever logo" />
       </NuxtLink>
 
@@ -72,7 +72,7 @@ watch(() => route.path, close);
           to="/cart"
           class="hidden md:block font-medium text-white uppercase text-base opacity-90 tracking-wide relative transition-opacity hover:opacity-100 relative"
         >
-          Cart
+          Login/register
           <span
             v-if="count > 0"
             class="absolute -top-2 -right-3 min-w-[18px] h-[18px] bg-error rounded-full text-white text-[0.7rem] font-bold flex items-center justify-center px-1"

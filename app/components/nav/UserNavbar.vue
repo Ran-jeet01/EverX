@@ -57,7 +57,7 @@ watch(() => route.path, close);
         to="/"
         class="text-2xl text-white flex items-center justify-center gap-2"
       >
-        Ever def
+        Ever
         <img src="~/assets/khu.png" class="h-[38px] w-auto" alt="Ever logo" />
       </NuxtLink>
 
@@ -117,7 +117,7 @@ watch(() => route.path, close);
         to="/products"
         class="text-white no-underline text-xl uppercase tracking-widest transition-colors flex items-center gap-2.5 hover:text-primary"
         @click="close"
-        >Product</NuxtLink
+        >ProductU</NuxtLink
       >
       <NuxtLink
         to="/about"

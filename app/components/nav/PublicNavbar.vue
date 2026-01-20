@@ -69,7 +69,7 @@ watch(() => route.path, close);
           >About Us</NuxtLink
         >
         <NuxtLink
-          to="/cart"
+          to="/auth"
           class="hidden md:block font-medium text-white uppercase text-base opacity-90 tracking-wide relative transition-opacity hover:opacity-100 relative"
         >
           Login/register

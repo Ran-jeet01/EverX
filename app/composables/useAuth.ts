@@ -1,25 +1,26 @@
-// composables/useAuth.ts   (or put it anywhere in composables/ folder)
+// type User = {
+//   role: "admin" | "user";
+// };
 
-import { computed, ref } from "vue";
+// export const useAuth = () => {
+//   const user = useCookie<User | null>("user");
+
+//   const isLoggedIn = computed(() => !!user.value);
+//   const isAdmin = computed(() => user.value?.role === "admin");
+
+//   return { user, isLoggedIn, isAdmin };
+// };
+type User = {
+  isAdmin: boolean;
+};
 
 export const useAuth = () => {
-  // Fake values – change these manually to test different states
-  const isLoggedIn = ref(false); // ← set to true to simulate logged-in user
-  const isAdmin = ref(false); // ← set to true to simulate admin
+  const user = useCookie<User | null>("user");
 
-  // Optional: helper to toggle for testing
-  const toggleLogin = () => {
-    isLoggedIn.value = !isLoggedIn.value;
-  };
+  user.value = { isAdmin: true };
 
-  const toggleAdmin = () => {
-    isAdmin.value = !isAdmin.value;
-  };
+  const isLoggedIn = computed(() => !!user.value); // true if cookie exists
+  const isAdmin = computed(() => user.value?.isAdmin ?? false); // directly from cookie
 
-  return {
-    isLoggedIn: computed(() => isLoggedIn.value),
-    isAdmin: computed(() => isAdmin.value),
-    toggleLogin, // optional – useful for testing
-    toggleAdmin,
-  };
+  return { isLoggedIn, isAdmin };
 };

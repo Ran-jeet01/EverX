@@ -43,7 +43,7 @@ watch(() => route.path, close);
         <NuxtLink
           to="/"
           class="font-medium text-white uppercase text-base opacity-90 tracking-wide relative transition-opacity hover:opacity-100"
-          >Store</NuxtLink
+          >Storee</NuxtLink
         >
         <NuxtLink
           to="/products"

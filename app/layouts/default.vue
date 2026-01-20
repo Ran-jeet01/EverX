@@ -1,19 +1,21 @@
-<script lang="ts">
-import PublicNavbar from "~/components/nav/PublicNavbar.vue";
-import AdminNavbar from "~/components/nav/AdminNavbar.vue";
-import UserNavbar from "~/components/nav/UserNavbar.vue";
-const { isAdmin, isLoggedIn } = useAuth();
+<!-- <script lang="ts" setup>
+const isAdminn = true;
+const isLoggedInn = false;
+console.log("default");
+console.log(isAdminn);
+console.log(isLoggedInn);
 </script>
 <template>
-  <!-- <AdminNavbar v-if="isAdmin" />
-  <UserNavbar v-else-if="isLoggedIn" />
-  <PublicNavbar v-else /> -->
-
   <ClientOnly>
-    <AdminNavbar v-if="isAdmin" />
-    <UserNavbar v-else-if="isLoggedIn" />
-    <PublicNavbar v-else />
+    <NavAdminNavbar v-if="isAdminn" />
+    <NavUserNavbar v-else-if="isLoggedInn" />
+    <NavPublicNavbar v-else />
   </ClientOnly>
+  <slot />
+</template>
+ -->
+<template>
+  <ClientOnly> <NavPublicNavbar /> </ClientOnly>
 
   <slot />
 </template>

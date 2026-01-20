@@ -1,16 +1,4 @@
 <script setup lang="ts">
-import { isAdmin, isLoggedIn } from "@/stores/user";
-
-// Evaluate once → perfect for test/fixed purpose
-const chosenLayout: "admin" | "user" | "default" = isAdmin
-  ? "admin"
-  : isLoggedIn
-    ? "user"
-    : "default";
-console.log(chosenLayout);
-definePageMeta({
-  layout: chosenLayout,
-});
 import ProductCard from "@/components/ProductCard.vue";
 import type { ProductDataType } from "@/types/product";
 import type { CartItem } from "@/types/cart";

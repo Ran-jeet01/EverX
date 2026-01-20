@@ -72,7 +72,7 @@ watch(() => route.path, close);
           to="/cart"
           class="hidden md:block font-medium text-white uppercase text-base opacity-90 tracking-wide relative transition-opacity hover:opacity-100 relative"
         >
-          Cart
+          Cartuser
           <span
             v-if="count > 0"
             class="absolute -top-2 -right-3 min-w-[18px] h-[18px] bg-error rounded-full text-white text-[0.7rem] font-bold flex items-center justify-center px-1"
@@ -123,7 +123,7 @@ watch(() => route.path, close);
         to="/about"
         class="text-white no-underline text-xl uppercase tracking-widest transition-colors flex items-center gap-2.5 hover:text-primary"
         @click="close"
-        >About Us</NuxtLink
+        >AboutUs</NuxtLink
       >
       <NuxtLink
         to="/cart"

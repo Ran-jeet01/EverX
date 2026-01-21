@@ -1,6 +1,8 @@
 <script setup lang="ts">
-navigateTo("/login");
+// Redirecting  to overview page if route is /admin
+navigateTo("/admin/overview");
 </script>
 
-<!-- pages/admin/index.vue -->
-<template></template>
+<template>
+  <div>redirecting</div>
+</template>

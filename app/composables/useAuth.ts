@@ -1,15 +1,3 @@
-// type User = {
-//   role: "admin" | "user";
-// };
-
-// export const useAuth = () => {
-//   const user = useCookie<User | null>("user");
-
-//   const isLoggedIn = computed(() => !!user.value);
-//   const isAdmin = computed(() => user.value?.role === "admin");
-
-//   return { user, isLoggedIn, isAdmin };
-// };
 type User = {
   isAdmin: boolean;
 };

@@ -1,3 +1,10 @@
+<script setup>
+import { loginSchema } from "~/schemas";
+definePageMeta({
+  layout: "auth",
+});
+</script>
+
 <template>
   <div class="login-page">
     <div class="header">
@@ -27,12 +34,6 @@
     </form>
   </div>
 </template>
-
-<script setup>
-definePageMeta({
-  layout: "auth",
-});
-</script>
 
 <style scoped>
 .header {

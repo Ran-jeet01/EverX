@@ -12,28 +12,33 @@ interface User {
   role: "Admin" | "User";
 }
 
-const users = ref<User[]>([
-  { id: 1, name: "Ranjit Poudel", email: "ranjit@example.com", role: "Admin" },
-  { id: 2, name: "Srijan Kandel", email: "srijan@example.com", role: "User" },
-  { id: 3, name: "Sujal Poudel", email: "sujal@example.com", role: "User" },
-  { id: 4, name: "Biswas Bista", email: "biswas@example.com", role: "User" },
-  { id: 5, name: "Sijan Pradhan", email: "sijan@example.com", role: "User" },
-]);
-
+// Reactive state
 const searchQuery = ref("");
 const isEditing = ref(false);
 const editingUser = ref<User | null>(null);
 const selectedRole = ref<User["role"]>("User");
 
+// Fetch users from API
+const { data, pending, error } = useFetch<User[]>("/api/user/users");
+
+// Use the fetched data directly (data is Ref<User[] | null>)
+const users = data;
+console.log(data);
+// Computed filtered users (safe against null)
 const filteredUsers = computed(() => {
-  if (!searchQuery.value) return users.value;
-  return users.value.filter((user) =>
-    user.email.toLowerCase().includes(searchQuery.value.toLowerCase()),
-  );
+  if (!users.value) return [];
+
+  if (!searchQuery.value.trim()) {
+    return users.value;
+  }
+
+  const query = searchQuery.value.toLowerCase().trim();
+  return users.value.filter((user) => user.email.toLowerCase().includes(query));
 });
 
+// Open edit modal
 const openEditModal = (user: User) => {
-  editingUser.value = user;
+  editingUser.value = { ...user }; // create a copy to avoid mutating original directly
   selectedRole.value = user.role;
   isEditing.value = true;
 };
@@ -41,21 +46,29 @@ const openEditModal = (user: User) => {
 const closeEditModal = () => {
   isEditing.value = false;
   editingUser.value = null;
+  // selectedRole.value = "User"; // optional reset
 };
 
+// Save role change (client-side only for now)
 const saveRole = () => {
-  if (editingUser.value) {
-    const user = users.value.find((u) => u.id === editingUser.value!.id);
-    if (user) {
-      user.role = selectedRole.value;
-    }
+  if (!editingUser.value || !users.value) return;
+
+  const user = users.value.find((u) => u.id === editingUser.value!.id);
+  if (user) {
+    user.role = selectedRole.value;
   }
+
   closeEditModal();
 };
 
+// Delete user
 const deleteUser = (id: number) => {
-  if (confirm("Delete this user?"))
+  if (!confirm("Are you sure you want to delete this user?")) return;
+
+  if (users.value) {
     users.value = users.value.filter((u) => u.id !== id);
+  }
+  closeEditModal();
 };
 </script>
 

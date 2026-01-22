@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "name": "EVER X Aero Tee",
+    "price": 50.0,
+    "category": "Tshirt",
+    "stock": 45,
+    "status": "In Stock",
+    "description": "High quality .",
+    "image": null
+  },
+  {
+    "id": 2,
+    "name": "EVER X Apex Jacket",
+    "price": 299.0,
+    "category": "Jacket",
+    "stock": 12,
+    "status": "In Stock",
+    "description": "Sleek, lightweight, durable jacket for adventures.",
+    "image": null
+  },
+  {
+    "id": 3,
+    "name": "EVER X Core Hoodie",
+    "price": 199.0,
+    "category": "Hoodie",
+    "stock": 0,
+    "status": "Out of Stock",
+    "description": "Soft, cozy hoodie for everyday comfort.",
+    "image": null
+  },
+  {
+    "id": 4,
+    "name": "EVER X Stride Pants",
+    "price": 99.0,
+    "category": "Pant",
+    "stock": 20,
+    "status": "In Stock",
+    "description": "Comfortable, flexible joggers for active lifestyles.",
+    "image": null
+  }
+]

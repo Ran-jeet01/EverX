@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "Ranjit Poudel",
+    "email": "ranjit@example.com",
+    "role": "Admin"
+  },
+  {
+    "id": 2,
+    "name": "Srijan Kandel",
+    "email": "srijan@example.com",
+    "role": "User"
+  },
+  {
+    "id": 3,
+    "name": "Sujal Poudel",
+    "email": "sujal@example.com",
+    "role": "User"
+  },
+  {
+    "id": 4,
+    "name": "Biswas Bista",
+    "email": "biswas@example.com",
+    "role": "User"
+  },
+  {
+    "id": 5,
+    "name": "Sijan. Pradhan",
+    "email": "sijan@example.com",
+    "role": "User"
+  },
+  {
+    "id": 6,
+    "name": "Sameer Chaudhary",
+    "email": "sameer@example.com",
+    "role": "User"
+  }
+]

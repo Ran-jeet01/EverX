@@ -5,68 +5,94 @@ definePageMeta({
   layout: "admin",
 });
 
+// types
 interface Product {
   id: number;
   name: string;
   price: number;
-  category: string;
+  category: "Tshirt" | "Hoodie" | "Jacket" | "Pant";
   stock: number;
   status: "In Stock" | "Out of Stock";
   description: string;
   image: string | null;
 }
 
-// Initial Mock Data
+interface ProductForm {
+  name: string;
+  price: number;
+  category: "Tshirt" | "Hoodie" | "Jacket" | "Pant";
+  stock: number;
+  description: string;
+  image: string | null;
+}
+
+// Static data for peoduct
 const products = ref<Product[]>([
   {
     id: 1,
-    name: "Premium Headphones",
-    price: 199.0,
-    category: "Electronics",
+    name: "EVER X Aero Tee",
+    price: 50.0,
+    category: "Tshirt",
     stock: 45,
     status: "In Stock",
-    description: "High quality noise cancelling headphones.",
+    description: "High quality .",
     image: null,
   },
   {
     id: 2,
-    name: "Ergonomic Office Chair",
+    name: "EVER X Apex Jacket",
     price: 299.0,
-    category: "Furniture",
+    category: "Jacket",
     stock: 12,
     status: "In Stock",
-    description: "Comfortable chair for long hours.",
+    description: "Sleek, lightweight, durable jacket for adventures.",
     image: null,
   },
   {
     id: 3,
-    name: "Wireless Mouse",
-    price: 49.0,
-    category: "Electronics",
+    name: "EVER X Core Hoodie",
+    price: 199.0,
+    category: "Hoodie",
     stock: 0,
     status: "Out of Stock",
-    description: "Smooth and precise wireless mouse.",
+    description: "Soft, cozy hoodie for everyday comfort.",
+    image: null,
+  },
+  {
+    id: 4,
+    name: "EVER X Stride Pants",
+    price: 99.0,
+    category: "Pant",
+    stock: 20,
+    status: "In Stock",
+    description: "Comfortable, flexible joggers for active lifestyles.",
     image: null,
   },
 ]);
 
-const defaultFormState = {
+// deafult form
+const defaultFormState: ProductForm = {
   name: "",
   price: 0,
-  category: "Electronics",
-  description: "",
+  category: "Hoodie",
   stock: 0,
-  status: "In Stock" as "In Stock" | "Out of Stock",
-  image: null as string | null,
+  description: "",
+  image: null,
 };
 
-const productForm = ref({ ...defaultFormState });
+const productForm = ref<ProductForm>({ ...defaultFormState });
 const showForm = ref(false);
 const isEditing = ref(false);
 const editingId = ref<number | null>(null);
 const imagePreview = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 
+// Logic for stock in and out
+const computedStatus = computed<"In Stock" | "Out of Stock">(() =>
+  productForm.value.stock > 0 ? "In Stock" : "Out of Stock",
+);
+
+// image handing
 const handleImageUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files[0]) {
@@ -78,11 +104,13 @@ const handleImageUpload = (event: Event) => {
 
 const triggerFileInput = () => fileInput.value?.click();
 
+// form logic part
 const resetForm = () => {
   productForm.value = { ...defaultFormState };
   imagePreview.value = null;
   isEditing.value = false;
   editingId.value = null;
+  showForm.value = false;
 };
 
 const toggleForm = () => {
@@ -91,7 +119,14 @@ const toggleForm = () => {
 };
 
 const editProduct = (product: Product) => {
-  productForm.value = { ...product };
+  productForm.value = {
+    name: product.name,
+    price: product.price,
+    category: product.category,
+    stock: product.stock,
+    description: product.description,
+    image: product.image,
+  };
   imagePreview.value = product.image;
   isEditing.value = true;
   editingId.value = product.id;
@@ -99,35 +134,32 @@ const editProduct = (product: Product) => {
 };
 
 const saveProduct = () => {
-  if (isEditing.value && editingId.value !== null) {
+  const finalProduct: Product = {
+    ...(isEditing.value ? { id: editingId.value! } : { id: Date.now() }),
+    ...productForm.value,
+    status: computedStatus.value,
+  };
+
+  if (isEditing.value) {
     const index = products.value.findIndex((p) => p.id === editingId.value);
-    if (index !== -1) {
-      products.value[index] = {
-        ...productForm.value,
-        id: editingId.value,
-        status: productForm.value.stock > 0 ? "In Stock" : "Out of Stock",
-      };
-    }
+    products.value[index] = finalProduct;
   } else {
-    const newId = Math.max(...products.value.map((p) => p.id), 0) + 1;
-    products.value.push({
-      ...productForm.value,
-      id: newId,
-      status: productForm.value.stock > 0 ? "In Stock" : "Out of Stock",
-    });
+    products.value.push(finalProduct);
   }
-  showForm.value = false;
+
   resetForm();
 };
 
 const deleteProduct = (id: number) => {
-  if (confirm("Delete this product?"))
+  if (confirm("Delete this product?")) {
     products.value = products.value.filter((p) => p.id !== id);
+  }
 };
 </script>
 
 <template>
-  <div class="animate-fade-in-down">
+  <div class="animate-fade-in-down p-6 md:p-10">
+    <!-- header -->
     <div
       class="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-4"
     >
@@ -137,7 +169,7 @@ const deleteProduct = (id: number) => {
       </div>
       <button
         @click="toggleForm"
-        class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 md:px-8 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2 w-full md:w-auto justify-center"
+        class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 md:px-8 py-3 rounded-2xl font-bold shadow-lg flex items-center gap-2 w-full md:w-auto justify-center"
       >
         <svg
           v-if="!showForm"
@@ -159,14 +191,14 @@ const deleteProduct = (id: number) => {
     <!-- Product Form -->
     <div
       v-if="showForm"
-      class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-xl border border-cyan-100 mb-12 animate-fade-in-down"
+      class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-xl border border-cyan-100 mb-12"
     >
       <h3 class="text-xl font-bold mb-10 text-slate-800">
         {{ isEditing ? "Update Details" : "New Listing" }}
       </h3>
       <form @submit.prevent="saveProduct">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10">
-          <!-- Media Section -->
+          <!-- Img section -->
           <div class="lg:col-span-1">
             <div
               class="aspect-square rounded-[2rem] bg-cyan-50 border-2 border-dashed border-cyan-200 flex flex-col items-center justify-center relative overflow-hidden group cursor-pointer"
@@ -218,7 +250,6 @@ const deleteProduct = (id: number) => {
             </div>
           </div>
 
-          <!-- Details Section -->
           <div
             class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8"
           >
@@ -230,7 +261,7 @@ const deleteProduct = (id: number) => {
               <input
                 v-model="productForm.name"
                 type="text"
-                class="w-full px-5 py-4 rounded-2xl bg-cyan-50 border-none text-slate-800 focus:ring-2 focus:ring-cyan-500 transition-all outline-none"
+                class="w-full px-5 py-4 rounded-2xl bg-cyan-50 border-none text-slate-800 focus:ring-2 focus:ring-cyan-500 outline-none"
                 required
               />
             </div>
@@ -243,7 +274,7 @@ const deleteProduct = (id: number) => {
                 v-model.number="productForm.price"
                 type="number"
                 step="0.01"
-                class="w-full px-5 py-4 rounded-2xl bg-cyan-50 border-none text-slate-800 focus:ring-2 focus:ring-cyan-500 transition-all outline-none"
+                class="w-full px-5 py-4 rounded-2xl bg-cyan-50 border-none text-slate-800 focus:ring-2 focus:ring-cyan-500 outline-none"
                 required
               />
             </div>
@@ -254,24 +285,23 @@ const deleteProduct = (id: number) => {
               >
               <select
                 v-model="productForm.category"
-                class="w-full px-5 py-4 rounded-2xl bg-cyan-50 border-none text-slate-800 focus:ring-2 focus:ring-cyan-500 transition-all outline-none appearance-none"
+                class="w-full px-5 py-4 rounded-2xl bg-cyan-50 border-none text-slate-800 focus:ring-2 focus:ring-cyan-500 outline-none"
               >
-                <option>Electronics</option>
-                <option>Furniture</option>
-                <option>Accessories</option>
-                <option>Clothing</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Furniture">Furniture</option>
               </select>
             </div>
             <div>
               <label
                 class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3"
-                >Manual Stock</label
+                >Stock</label
               >
               <input
                 v-model.number="productForm.stock"
                 type="number"
-                class="w-full px-5 py-4 rounded-2xl bg-cyan-50 border-none text-slate-800 focus:ring-2 focus:ring-cyan-500 transition-all outline-none"
+                class="w-full px-5 py-4 rounded-2xl bg-cyan-50 border-none text-slate-800 focus:ring-2 focus:ring-cyan-500 outline-none"
               />
+              <p class="text-xs mt-1">Status: {{ computedStatus }}</p>
             </div>
             <div class="md:col-span-2">
               <label
@@ -281,7 +311,7 @@ const deleteProduct = (id: number) => {
               <textarea
                 v-model="productForm.description"
                 rows="3"
-                class="w-full px-5 py-4 rounded-2xl bg-cyan-50 border-none text-slate-800 focus:ring-2 focus:ring-cyan-500 transition-all outline-none resize-none"
+                class="w-full px-5 py-4 rounded-2xl bg-cyan-50 border-none text-slate-800 focus:ring-2 focus:ring-cyan-500 outline-none resize-none"
               ></textarea>
             </div>
             <div
@@ -289,7 +319,7 @@ const deleteProduct = (id: number) => {
             >
               <button
                 type="submit"
-                class="bg-cyan-500 hover:bg-cyan-600 text-white px-10 py-4 rounded-[1.5rem] font-bold transition-all shadow-xl shadow-cyan-500/30 w-full sm:w-auto"
+                class="bg-cyan-500 hover:bg-cyan-600 text-white px-10 py-4 rounded-[1.5rem] font-bold shadow-xl w-full sm:w-auto"
               >
                 {{ isEditing ? "Update Item" : "Create Listing" }}
               </button>
@@ -299,7 +329,7 @@ const deleteProduct = (id: number) => {
       </form>
     </div>
 
-    <!-- Inventory List -->
+    <!-- Inventory list -->
     <div
       class="bg-white rounded-[2.5rem] shadow-sm border border-cyan-100 overflow-hidden"
     >
@@ -310,9 +340,9 @@ const deleteProduct = (id: number) => {
           >
             <tr>
               <th class="px-10 py-6">Identity</th>
-              <th class="px-10 py-6">Class</th>
+              <th class="px-10 py-6">Category</th>
               <th class="px-10 py-6">Price</th>
-              <th class="px-10 py-6">Inventory</th>
+              <th class="px-10 py-6">Stock</th>
               <th class="px-10 py-6 text-right">Actions</th>
             </tr>
           </thead>
@@ -329,7 +359,6 @@ const deleteProduct = (id: number) => {
                   <img
                     v-if="product.image"
                     :src="product.image"
-                    alt="Product"
                     class="h-full w-full object-cover"
                   />
                   <svg
@@ -368,17 +397,19 @@ const deleteProduct = (id: number) => {
               </td>
               <td class="px-10 py-8">
                 <span
-                  class="text-sm font-extrabold"
                   :class="
-                    product.stock > 0 ? 'text-emerald-500' : 'text-rose-500'
+                    product.stock > 0
+                      ? 'text-emerald-500 font-extrabold'
+                      : 'text-rose-500 font-extrabold'
                   "
-                  >{{ product.stock }} UNIT</span
                 >
+                  {{ product.stock }} UNIT
+                </span>
               </td>
               <td class="px-10 py-8 text-right space-x-4">
                 <button
                   @click="editProduct(product)"
-                  class="p-2 text-slate-400 hover:text-cyan-500 transition-colors"
+                  class="p-2 text-slate-400 hover:text-cyan-500"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -397,7 +428,7 @@ const deleteProduct = (id: number) => {
                 </button>
                 <button
                   @click="deleteProduct(product.id)"
-                  class="p-2 text-slate-400 hover:text-rose-500 transition-colors"
+                  class="p-2 text-slate-400 hover:text-rose-500"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

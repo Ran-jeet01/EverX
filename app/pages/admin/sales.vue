@@ -5,11 +5,11 @@ definePageMeta({
 
 const revenueSeries = [
   {
-    name: "Revenue",
+    name: "This Year",
     data: [31000, 40000, 28000, 51000, 42000, 109000, 100000],
   },
   {
-    name: "Target",
+    name: "Previous",
     data: [11000, 32000, 45000, 32000, 34000, 52000, 41000],
   },
 ];
@@ -55,7 +55,7 @@ const ordersChartOptions = {
     fontFamily: "inherit",
     animations: { enabled: true },
   },
-  labels: ["Electronics", "Clothing", "Home", "b2b"],
+  labels: ["Pant", "TShirt", "Jacket", "Hoodie"],
   colors: ["#06b6d4", "#8b5cf6", "#f59e0b", "#10b981"],
   plotOptions: {
     pie: {

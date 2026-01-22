@@ -41,7 +41,7 @@ const stats = [
 const series = [
   {
     name: "Active Activity",
-    data: [44, 55, 57, 56, 61, 58, 63, 60, 66, 70, 75, 80],
+    data: [44, 55, 57, 56, 61, 58, 63, 60, 66, 70, 75, 100],
   },
 ];
 
@@ -62,7 +62,7 @@ const chartOptions = {
   plotOptions: {
     bar: {
       horizontal: false,
-      columnWidth: "55%",
+      columnWidth: "60%",
       borderRadius: 6,
       borderRadiusApplication: "end",
     },
@@ -82,7 +82,7 @@ const chartOptions = {
       "Sep",
       "Oct",
       "Nov",
-      "Dec",
+      "Dc",
     ],
     axisBorder: { show: false },
     axisTicks: { show: false },
@@ -142,12 +142,12 @@ const chartOptions = {
         ></div>
 
         <div class="flex justify-between items-start mb-6">
-          <div
-            class="p-4 rounded-2xl bg-opacity-10 text-3xl"
-            :style="{ backgroundColor: stat.color + '10' }"
-          >
-            {{ stat.icon }}
-          </div>
+          <!-- <div
+              class="p-4 rounded-2xl bg-opacity-10 text-3xl"
+              :style="{ backgroundColor: stat.color + '10' }"
+            >
+              {{ stat.icon }}
+            </div> -->
           <span
             :class="
               stat.trend === 'up'
@@ -180,8 +180,8 @@ const chartOptions = {
       >
         <h3 class="text-xl font-bold text-slate-800">Active Activity</h3>
         <div class="flex gap-2">
-          <span class="h-2 w-2 rounded-full bg-cyan-500"></span>
-          <span class="h-2 w-2 rounded-full bg-slate-200"></span>
+          <!-- <span class="h-2 w-2 rounded-full bg-cyan-500"></span>
+          <span class="h-2 w-2 rounded-full bg-slate-200"></span> -->
         </div>
       </div>
 

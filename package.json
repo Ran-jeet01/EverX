@@ -12,12 +12,14 @@
   "dependencies": {
     "@iconify/vue": "^5.0.0",
     "@pinia/nuxt": "^0.11.3",
+    "apexcharts": "^5.3.6",
     "axios": "^1.13.2",
     "nuxt": "^4.2.2",
     "pinia": "^3.0.4",
     "pinia-plugin-persistedstate": "^4.7.1",
     "vue": "^3.5.26",
-    "vue-router": "^4.6.4"
+    "vue-router": "^4.6.4",
+    "vue3-apexcharts": "^1.10.0"
   },
   "devDependencies": {
     "@iconify-json/carbon": "^1.2.18",
@@ -26,6 +28,7 @@
     "@nuxt/icon": "2.2.0",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@types/node": "^25.0.9",
-    "unplugin-icons": "^23.0.1"
+    "unplugin-icons": "^23.0.1",
+    "zod": "^4.3.5"
   }
 }

@@ -5,7 +5,7 @@ type User = {
 export const useAuth = () => {
   const user = useCookie<User | null>("user");
 
-  user.value = { isAdmin: false };
+  user.value = { isAdmin: true };
 
   const isLoggedIn = computed(() => !!user.value); // true if cookie exists
   const isAdmin = computed(() => user.value?.isAdmin ?? false); // directly from cookie

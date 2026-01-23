@@ -1,4 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const { isLoggedIn, isAdmin } = useAuth();
+
+definePageMeta({
+  layout: isLoggedIn.value ? "user" : "default",
+});
+</script>
 
 <template>
   <div class="animate-[fadeIn_0.5s_ease-out]">

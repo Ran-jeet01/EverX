@@ -1,4 +1,9 @@
 <script setup lang="ts">
+const { isLoggedIn, isAdmin } = useAuth();
+
+definePageMeta({
+  layout: isLoggedIn.value ? "user" : "default",
+});
 import ProductCard from "@/components/ProductCard.vue";
 import type { ProductDataType } from "@/types/product";
 import type { CartItem } from "@/types/cart";

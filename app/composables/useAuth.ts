@@ -1,14 +1,11 @@
-type User = {
-  isAdmin: boolean;
-};
+// app/composables/useAuth.ts
+import { computed } from "vue";
 
 export const useAuth = () => {
-  const user = useCookie<User | null>("user");
+  const role: "guest" | "user" | "admin" = "guest"; // or 'guest' / 'user'
 
-  user.value = { isAdmin: true };
-
-  const isLoggedIn = computed(() => !!user.value); // true if cookie exists
-  const isAdmin = computed(() => user.value?.isAdmin ?? false); // directly from cookie
+  const isLoggedIn = computed(() => role !== ("guest" as any)); // ← add "as any" here
+  const isAdmin = computed(() => role === ("admin" as any)); // ← add "as any" here
 
   return { isLoggedIn, isAdmin };
 };

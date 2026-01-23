@@ -1,4 +1,7 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: "user",
+});
 import EmptyCart from "@/components/EmptyCart.vue";
 import { ref, onMounted, computed } from "vue";
 import { useCartStore } from "@/stores/cartStore";

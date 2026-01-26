@@ -5,37 +5,60 @@
       <p>Join us today! It only takes a minute.</p>
     </div>
 
-    <form @submit.prevent class="auth-form">
+    <form @submit.prevent="handleRegister" class="auth-form">
+      <div v-if="error" class="error-message">{{ error }}</div>
       <div class="form-group">
         <label for="name">Full Name</label>
         <div class="input-wrapper">
-          <input type="text" id="name" placeholder="John Doe" />
+          <input
+            v-model="form.name"
+            type="text"
+            id="name"
+            placeholder="John Doe"
+            required
+          />
         </div>
       </div>
 
       <div class="form-group">
         <label for="email">Email Address</label>
         <div class="input-wrapper">
-          <input type="email" id="email" placeholder="name@example.com" />
+          <input
+            v-model="form.email"
+            type="email"
+            id="email"
+            placeholder="name@example.com"
+            required
+          />
         </div>
       </div>
 
       <div class="form-group">
         <label for="password">Password</label>
         <div class="input-wrapper">
-          <input type="password" id="password" placeholder="••••••••" />
+          <input
+            v-model="form.password"
+            type="password"
+            id="password"
+            placeholder="••••••••"
+            required
+          />
         </div>
       </div>
 
       <div class="terms">
-        <input type="checkbox" id="terms" />
+        <input type="checkbox" id="terms" required />
         <label for="terms"
           >I agree to the <a href="#">Terms & Conditions</a></label
         >
       </div>
 
-      <button type="submit" class="submit-btn highlight-glow">
-        Getting Started
+      <button
+        type="submit"
+        class="submit-btn highlight-glow"
+        :disabled="loading"
+      >
+        {{ loading ? "Creating Account..." : "Getting Started" }}
       </button>
     </form>
 
@@ -51,6 +74,27 @@
 definePageMeta({
   layout: "auth",
 });
+
+const { register } = useAuth();
+const form = reactive({
+  name: "",
+  email: "",
+  password: "",
+});
+const loading = ref(false);
+const error = ref("");
+
+const handleRegister = async () => {
+  loading.value = true;
+  error.value = "";
+  try {
+    await register(form);
+  } catch (e) {
+    error.value = e.response?._data?.statusMessage || "Registration failed";
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <style scoped>
@@ -181,5 +225,15 @@ label {
 
 .highlight-glow:hover::after {
   opacity: 1;
+}
+
+.error-message {
+  color: #ef4444;
+  background-color: #fef2f2;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.9em;
+  text-align: center;
+  border: 1px solid #fecaca;
 }
 </style>

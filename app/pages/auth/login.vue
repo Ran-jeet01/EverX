@@ -3,6 +3,26 @@ import { loginSchema } from "~/schemas";
 definePageMeta({
   layout: "auth",
 });
+
+const { login } = useAuth();
+const form = reactive({
+  email: "",
+  password: "",
+});
+const loading = ref(false);
+const error = ref("");
+
+const handleLogin = async () => {
+  loading.value = true;
+  error.value = "";
+  try {
+    await login(form);
+  } catch (e) {
+    error.value = e.response?._data?.statusMessage || "Login failed";
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -12,11 +32,18 @@ definePageMeta({
       <p>Enter your credentials to access your account</p>
     </div>
 
-    <form @submit.prevent class="auth-form">
+    <form @submit.prevent="handleLogin" class="auth-form">
+      <div v-if="error" class="error-message">{{ error }}</div>
       <div class="form-group">
         <label for="email">Email Address</label>
         <div class="input-wrapper">
-          <input type="email" id="email" placeholder="name@example.com" />
+          <input
+            v-model="form.email"
+            type="email"
+            id="email"
+            placeholder="name@example.com"
+            required
+          />
         </div>
       </div>
 
@@ -26,11 +53,23 @@ definePageMeta({
           <a href="#" class="forgot-link">Forgot?</a>
         </div>
         <div class="input-wrapper">
-          <input type="password" id="password" placeholder="••••••••" />
+          <input
+            v-model="form.password"
+            type="password"
+            id="password"
+            placeholder="••••••••"
+            required
+          />
         </div>
       </div>
 
-      <button type="submit" class="submit-btn highlight-glow">Sign In</button>
+      <button
+        type="submit"
+        class="submit-btn highlight-glow"
+        :disabled="loading"
+      >
+        {{ loading ? "Signing In..." : "Sign In" }}
+      </button>
     </form>
   </div>
 </template>
@@ -138,5 +177,15 @@ label {
 
 .highlight-glow:hover::after {
   opacity: 1;
+}
+
+.error-message {
+  color: #ef4444;
+  background-color: #fef2f2;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.9em;
+  text-align: center;
+  border: 1px solid #fecaca;
 }
 </style>

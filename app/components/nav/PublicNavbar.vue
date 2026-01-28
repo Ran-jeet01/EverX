@@ -3,7 +3,6 @@ import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useCartStore } from "@/stores/cartStore";
 
-const cart = useCartStore();
 const route = useRoute();
 
 const open = ref(false);
@@ -12,8 +11,6 @@ const y = ref(0);
 const solidNav = computed(
   () => y.value > 40 || !["/", "/about"].includes(route.path),
 );
-
-const count = computed(() => cart.items?.length || 0);
 
 const toggle = () => (open.value = !open.value);
 const close = () => (open.value = false);
@@ -73,11 +70,6 @@ watch(() => route.path, close);
           class="hidden md:block font-medium text-white uppercase text-base opacity-90 tracking-wide relative transition-opacity hover:opacity-100 relative"
         >
           Login/register
-          <span
-            v-if="count > 0"
-            class="absolute -top-2 -right-3 min-w-[18px] h-[18px] bg-error rounded-full text-white text-[0.7rem] font-bold flex items-center justify-center px-1"
-            >{{ count }}</span
-          >
         </NuxtLink>
 
         <button
@@ -130,7 +122,7 @@ watch(() => route.path, close);
         class="text-white no-underline text-xl uppercase tracking-widest transition-colors flex items-center gap-2.5 hover:text-primary"
         @click="close"
       >
-        Cart <span v-if="count > 0">({{ count }})</span>
+        Login/Register
       </NuxtLink>
     </div>
   </aside>

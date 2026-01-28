@@ -1,9 +1,6 @@
 <script setup lang="ts">
-const { isLoggedIn, isAdmin } = useAuth();
-
-definePageMeta({
-  layout: isLoggedIn.value ? "user" : "default",
-});
+// Layout is handled by middleware or can be set statically
+// definePageMeta cannot access reactive composable values
 </script>
 
 <template>

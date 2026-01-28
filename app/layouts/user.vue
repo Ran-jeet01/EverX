@@ -3,6 +3,8 @@ console.log("User layout");
 </script>
 
 <template>
-  <NavUserNavbar />
+  <ClientOnly>
+    <NavUserNavbar />
+  </ClientOnly>
   <slot />
 </template>

@@ -1,10 +1,4 @@
 <script setup lang="ts">
-const { isLoggedIn, isAdmin } = useAuth();
-
-definePageMeta({
-  layout: isLoggedIn.value ? "user" : "default",
-});
-
 import { useProductsStore } from "~/stores/productsStore";
 import { useCartStore } from "~/stores/cartStore";
 import type { ProductDataType } from "~/types/product";

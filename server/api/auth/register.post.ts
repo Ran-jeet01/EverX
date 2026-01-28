@@ -1,22 +1,29 @@
-// import { users } from '~/server/db/schema';
-// import { db } from '~/server/utils/drizzle';
-import { db } from "../../utils/drizzle";
 import { users } from "../../db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { z } from "zod";
+
+const registerSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+  name: z.string().optional(),
+});
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const { email, password, name } = body;
+  const result = registerSchema.safeParse(body);
 
-  if (!email || !password || !name) {
+  if (!result.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Missing required fields",
+      statusMessage: "Invalid input",
+      data: result.error.flatten(),
     });
   }
 
-  // Check if user already exists
+  const { email, password, name } = result.data;
+
+  // Check if user exists
   const existingUser = await db
     .select()
     .from(users)
@@ -33,19 +40,21 @@ export default defineEventHandler(async (event) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // Create user
+  // Role defaults to 'user' in schema, so we don't need to specify it unless we want to force it
   const newUser = await db
     .insert(users)
     .values({
       email,
-      name,
       password: hashedPassword,
+      name,
+      role: "user", // Explicitly setting it as requested
     })
-    .returning({
-      id: users.id,
-      email: users.email,
-      name: users.name,
-      createdAt: users.createdAt,
-    });
+    .returning();
 
-  return newUser[0];
+  return {
+    id: newUser[0].id,
+    email: newUser[0].email,
+    name: newUser[0].name,
+    role: newUser[0].role,
+  };
 });

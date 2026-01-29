@@ -6,10 +6,10 @@ definePageMeta({
 });
 
 interface User {
-  id: number;
-  name: string;
+  id: string;
+  name: string | null;
   email: string;
-  role: "Admin" | "User";
+  role: string;
 }
 
 // Reactive state
@@ -49,26 +49,50 @@ const closeEditModal = () => {
   // selectedRole.value = "User"; // optional reset
 };
 
-// Save role change (client-side only for now)
-const saveRole = () => {
+// Save role change
+const saveRole = async () => {
   if (!editingUser.value || !users.value) return;
 
-  const user = users.value.find((u) => u.id === editingUser.value!.id);
-  if (user) {
-    user.role = selectedRole.value;
-  }
+  try {
+    await $fetch('/api/user/users', {
+      method: 'PUT',
+      body: {
+        id: editingUser.value.id,
+        role: selectedRole.value.toLowerCase() // Ensure backend receives lowercase 'admin'/'user'
+      }
+    });
 
-  closeEditModal();
+    const user = users.value.find((u) => u.id === editingUser.value!.id);
+    if (user) {
+      user.role = selectedRole.value.toLowerCase(); // Update local state
+    }
+    const { success } = useToast();
+    success('Role updated successfully');
+    closeEditModal();
+  } catch (e) {
+    const { error } = useToast();
+    error('Failed to update role');
+  }
 };
 
 // Delete user
-const deleteUser = (id: number) => {
+const deleteUser = async (id: string) => {
   if (!confirm("Are you sure you want to delete this user?")) return;
 
-  if (users.value) {
-    users.value = users.value.filter((u) => u.id !== id);
+  try {
+    await $fetch(`/api/user/users?id=${id}`, {
+      method: 'DELETE'
+    });
+
+    if (users.value) {
+      users.value = users.value.filter((u) => u.id !== id);
+    }
+    const { success } = useToast();
+    success('User deleted successfully');
+  } catch (e) {
+    const { error } = useToast();
+    error('Failed to delete user');
   }
-  closeEditModal();
 };
 </script>
 
@@ -135,9 +159,9 @@ const deleteUser = (id: number) => {
                 <div
                   class="h-12 w-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-cyan-400 flex items-center justify-center text-white font-black text-sm shadow-md shadow-cyan-500/20"
                 >
-                  {{ user.name.charAt(0) }}
+                  {{ (user.name || user.email).charAt(0).toUpperCase() }}
                 </div>
-                <span class="font-bold text-slate-800">{{ user.name }}</span>
+                <span class="font-bold text-slate-800">{{ user.name || 'Unknown' }}</span>
               </td>
               <td class="px-10 py-8 text-slate-500 font-medium text-sm">
                 {{ user.email }}
@@ -145,8 +169,8 @@ const deleteUser = (id: number) => {
               <td class="px-10 py-8">
                 <span
                   :class="{
-                    'bg-cyan-500/10 text-cyan-600': user.role === 'Admin',
-                    'bg-slate-100 text-slate-500': user.role !== 'Admin',
+                    'bg-cyan-500/10 text-cyan-600': user.role === 'admin',
+                    'bg-slate-100 text-slate-500': user.role !== 'admin',
                   }"
                   class="px-4 py-1.5 text-[10px] font-black rounded-xl uppercase tracking-widest"
                 >

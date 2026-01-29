@@ -1,32 +1,22 @@
-// server/api/users.get.ts
-import { readFile } from "fs/promises";
-import { join } from "path";
+import { db } from '../../utils/drizzle';
+import { users } from '../../db/schemas/users';
+import { desc } from 'drizzle-orm';
 
-const filePath = join(process.cwd(), "server/mock/users.json");
-
-console.log("Current working directory:", process.cwd());
-console.log("Trying to read this exact file:", filePath);
-
-let cachedData: any = null;
-
-export default defineEventHandler(async () => {
-  if (cachedData) return cachedData;
+export default defineEventHandler(async (event) => {
+  // In a real app, we should check for admin role here
+  // const { user } = await requireUserSession(event);
+  // if (user.role !== 'admin') throw createError({ statusCode: 403 });
 
   try {
-    console.log("Reading file...");
-    const raw = await readFile(filePath, "utf-8");
-    console.log("File content length:", raw.length);
-    cachedData = JSON.parse(raw);
-    console.log("Successfully parsed mock data");
-    return cachedData;
+    const allUsers = await db.select().from(users).orderBy(desc(users.createdAt));
+
+    // Remove password from response
+    return allUsers.map(({ password, ...u }) => u);
   } catch (err: any) {
-    console.error("ERROR loading mock data:");
-    console.error("Message:", err.message);
-    console.error("Stack:", err.stack);
     throw createError({
       statusCode: 500,
-      statusMessage: "Failed to load mock users",
-      message: err.message || "Internal server error - mock data unavailable",
+      statusMessage: "Failed to load users",
+      message: err.message,
     });
   }
 });

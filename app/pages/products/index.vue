@@ -13,8 +13,7 @@ const cartStore = useCartStore();
 const loading = ref(true);
 
 const handleAddToCart = (product: ProductDataType) => {
-  const cartItem: CartItem = { ...product, quantity: 1 };
-  cartStore.addToCart(cartItem);
+  cartStore.addToCart(product);
 };
 
 onMounted(async () => {

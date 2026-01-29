@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
       email,
       password: hashedPassword,
       name,
-      role: "user", // Explicitly setting it as requested
+      role: "user ", // Explicitly setting it as requested
     })
     .returning();
 

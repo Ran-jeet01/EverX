@@ -13,10 +13,9 @@ const cartStore = useCartStore();
 const cartItems = computed(() => cartStore.items);
 console.log(cartItems.value);
 
-// removing the value individually
-const removeFromCart = cartStore.removeFromCart;
-const increaseQuantity = cartStore.increaseQuantity;
-const decreaseQuantity = cartStore.decreaseQuantity;
+onMounted(async () => {
+    await cartStore.loadCart();
+});
 </script>
 
 <template>
@@ -56,7 +55,7 @@ const decreaseQuantity = cartStore.decreaseQuantity;
               <div class="flex items-center border border-slate-200">
                 <button
                   class="w-8 h-8 flex items-center justify-center bg-white border-none cursor-pointer text-slate-600 transition-all duration-200 hover:bg-slate-50 hover:text-black"
-                  @click="decreaseQuantity(item.id)"
+                  @click="cartStore.decreaseQuantity(item.id)"
                 >
                   <Icon name="ri:subtract-line" size="24" />
                 </button>
@@ -65,14 +64,14 @@ const decreaseQuantity = cartStore.decreaseQuantity;
                 }}</span>
                 <button
                   class="w-8 h-8 flex items-center justify-center bg-white border-none cursor-pointer text-slate-600 transition-all duration-200 hover:bg-slate-50 hover:text-black"
-                  @click="increaseQuantity(item.id)"
+                  @click="cartStore.increaseQuantity(item.id)"
                 >
                   <Icon name="ri:add-line" size="24" />
                 </button>
               </div>
               <button
                 class="bg-transparent border-none text-red-500 text-sm cursor-pointer underline p-0 hover:text-red-600"
-                @click="removeFromCart(item.id)"
+                @click="cartStore.removeFromCart(item.id)"
               >
                 Remove
               </button>

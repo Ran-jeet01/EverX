@@ -1,226 +1,130 @@
-// import { defineStore } from "pinia";
-// import { ref, computed, watch } from "vue";
-// import type { CartItem } from "@/types/cart";
-
-// const CART_KEY = "my-cart";
-
-// export const useCartStore = defineStore("cart", () => {
-//   const items = ref<CartItem[]>(
-//     JSON.parse(localStorage.getItem(CART_KEY) || "[]")
-//   );
-//   watch(
-//     items,
-//     (val) => {
-//       localStorage.setItem(CART_KEY, JSON.stringify(val));
-//     },
-//     { deep: true }
-//   );
-
-//   const addToCart = (product: CartItem) => {
-//     console.log(product);
-//     const existing = items.value.find((p) => p.id === product.id);
-//     if (existing) {
-//       existing.quantity += 1;
-//     } else {
-//       items.value.push({ ...product, quantity: 1 });
-//     }
-//   };
-
-//   const removeFromCart = (id: number) => {
-//     items.value = items.value.filter((p) => p.id !== id);
-//   };
-
-//   const clearCart = () => {
-//     items.value = [];
-//   };
-
-//   const increaseQuantity = (id: number) => {
-//     const item = items.value.find((p) => p.id === id);
-//     if (item) {
-//       item.quantity += 1;
-//     }
-//   };
-
-//   // decrease quantity by 1and remove if 0
-//   const decreaseQuantity = (id: number) => {
-//     const item = items.value.find((p) => p.id === id);
-//     if (item) {
-//       if (item.quantity > 1) {
-//         item.quantity -= 1;
-//       } else {
-//         removeFromCart(id);
-//       }
-//     }
-//   };
-
-//   // Computed
-//   const totalPrice = computed(() =>
-//     items.value.reduce((acc, p) => acc + p.price * p.quantity, 0)
-//   );
-
-//   return {
-//     items,
-//     addToCart,
-//     removeFromCart,
-//     clearCart,
-//     totalPrice,
-//     increaseQuantity,
-//     decreaseQuantity,
-//   };
-// // });
-// import { defineStore } from "pinia";
-// import { ref, computed, watch } from "vue";
-// import type { CartItem } from "@/types/cart";
-
-// const CART_KEY = "my-cart";
-
-// export const useCartStore = defineStore("cart", () => {
-//   const items = ref<CartItem[]>([]);
-
-//   // Load from localStorage only on client
-//   if (import.meta.client) {
-//     try {
-//       const saved = localStorage.getItem(CART_KEY);
-//       if (saved) {
-//         items.value = JSON.parse(saved);
-//       }
-//     } catch (err) {
-//       console.warn("Failed to load cart from localStorage", err);
-//     }
-//   }
-
-//   // Save to localStorage whenever items change (only on client)
-//   watch(
-//     items,
-//     (newVal) => {
-//       if (import.meta.client) {
-//         localStorage.setItem(CART_KEY, JSON.stringify(newVal));
-//       }
-//     },
-//     { deep: true }
-//   );
-
-//   const addToCart = (product: CartItem) => {
-//     console.log(product);
-//     const existing = items.value.find((p) => p.id === product.id);
-//     if (existing) {
-//       existing.quantity += 1;
-//     } else {
-//       items.value.push({ ...product, quantity: 1 });
-//     }
-//   };
-
-//   const removeFromCart = (id: number) => {
-//     items.value = items.value.filter((p) => p.id !== id);
-//   };
-
-//   const clearCart = () => {
-//     items.value = [];
-//   };
-
-//   const increaseQuantity = (id: number) => {
-//     const item = items.value.find((p) => p.id === id);
-//     if (item) {
-//       item.quantity += 1;
-//     }
-//   };
-
-//   const decreaseQuantity = (id: number) => {
-//     const item = items.value.find((p) => p.id === id);
-//     if (item) {
-//       if (item.quantity > 1) {
-//         item.quantity -= 1;
-//       } else {
-//         removeFromCart(id);
-//       }
-//     }
-//   };
-
-//   const totalPrice = computed(() =>
-//     items.value.reduce((acc, p) => acc + p.price * p.quantity, 0)
-//   );
-
-//   return {
-//     items,
-//     addToCart,
-//     removeFromCart,
-//     clearCart,
-//     totalPrice,
-//     increaseQuantity,
-//     decreaseQuantity,
-//   };
-// });
-// stores/cart.ts - FIXED
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
-import type { CartItem } from "@/types/cart";
+import { useProductsStore } from "./productsStore";
 
-export const useCartStore = defineStore(
-  "cart",
-  () => {
-    const items = ref<CartItem[]>([]);
+export const useCartStore = defineStore("cart", () => {
+    const productsStore = useProductsStore();
+    const rawItems = ref<any[]>([]);
 
-    // Actions (keep your existing actions)
-    const addToCart = (product: CartItem) => {
-      console.log(product);
-      const existing = items.value.find((p) => p.id === product.id);
-      if (existing) {
-        existing.quantity += 1;
-      } else {
-        items.value.push({ ...product, quantity: 1 });
-      }
-    };
+    const items = computed(() => {
+        return rawItems.value.map((item) => {
+            const product = productsStore.products.find((p) => p.id === item.productId);
+            return {
+                ...item,
+                title: product?.title || 'Loading...',
+                price: product?.price || 0,
+                image: product?.image || '',
+                category: product?.category || '',
+                description: product?.description || '',
+            };
+        });
+    });
 
-    const removeFromCart = (id: number) => {
-      items.value = items.value.filter((p) => p.id !== id);
-    };
+    const totalPrice = computed(() => {
+        return items.value
+            .reduce((total, item) => total + (item.price * item.quantity), 0)
+            .toFixed(2);
+    });
 
-    const clearCart = () => {
-      items.value = [];
-    };
+    const loadCart = async () => {
+        try {
+            // Ensure products are loaded for mapping
+            if (productsStore.products.length === 0) {
+                await productsStore.loadProducts();
+            }
 
-    const increaseQuantity = (id: number) => {
-      const item = items.value.find((p) => p.id === id);
-      if (item) {
-        item.quantity += 1;
-      }
-    };
+            const { user } = useAuth();
+            if (!user.value) {
+                rawItems.value = [];
+                return;
+            }
 
-    const decreaseQuantity = (id: number) => {
-      const item = items.value.find((p) => p.id === id);
-      if (item) {
-        if (item.quantity > 1) {
-          item.quantity -= 1;
-        } else {
-          removeFromCart(id);
+            const data = await $fetch('/api/cart');
+            rawItems.value = data as any[];
+        } catch (e) {
+            console.error("Failed to load cart", e);
         }
-      }
     };
 
-    const totalPrice = computed(() =>
-      items.value.reduce((acc, p) => acc + p.price * p.quantity, 0)
-    );
+    const addToCart = async (product: any) => {
+        const { user } = useAuth();
+        const { success } = useToast();
 
-    const itemCount = computed(() =>
-      items.value.reduce((acc, p) => acc + p.quantity, 0)
-    );
+        if (!user.value) {
+            navigateTo('/auth/login');
+            return;
+        }
+
+        try {
+            await $fetch('/api/cart', {
+                method: 'POST',
+                body: { productId: product.id, quantity: 1 }
+            });
+            success('Added to cart');
+            await loadCart();
+        } catch (e) {
+            console.error("Failed to add to cart", e);
+        }
+    };
+
+    const removeFromCart = async (id: number) => {
+        try {
+            await $fetch(`/api/cart?id=${id}`, {
+                method: 'DELETE'
+            });
+            await loadCart();
+        } catch (e) {
+            console.error("Failed to remove item", e);
+        }
+    };
+
+    const increaseQuantity = async (id: number) => {
+        await updateQuantity(id, 1);
+    };
+
+    const decreaseQuantity = async (id: number) => {
+        await updateQuantity(id, -1);
+    };
+
+    const updateQuantity = async (id: number, change: number) => {
+        const item = rawItems.value.find(i => i.id === id);
+        if (!item) return;
+
+        const newQuantity = item.quantity + change;
+        if (newQuantity <= 0) {
+            await removeFromCart(id);
+            return;
+        }
+
+        try {
+            await $fetch('/api/cart', {
+                method: 'PUT',
+                body: { id, quantity: newQuantity }
+            });
+            await loadCart();
+        } catch (e) {
+            console.error("Failed to update quantity", e);
+        }
+    };
+
+    const clearCart = async () => {
+        // Since there is no clear all API, we loop delete? 
+        // Or just clear state locally for now, but that's not persistent.
+        // Let's loop delete for now as it is safest without backend changes.
+        // Ideally backend should support DELETE /api/cart (all)
+        for (const item of rawItems.value) {
+            await removeFromCart(item.id);
+        }
+    };
 
     return {
-      items,
-      addToCart,
-      removeFromCart,
-      clearCart,
-      totalPrice,
-      itemCount,
-      increaseQuantity,
-      decreaseQuantity,
+        items,
+        rawItems,
+        totalPrice,
+        loadCart,
+        addToCart,
+        removeFromCart,
+        increaseQuantity,
+        decreaseQuantity,
+        clearCart
     };
-  },
-  {
-    //  Use Nuxt's runtimeConfig instead of process
-    persist: {
-      key: "my-cart",
-      storage: typeof window !== "undefined" ? localStorage : undefined,
-    },
-  }
-);
+});

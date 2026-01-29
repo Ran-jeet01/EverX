@@ -6,5 +6,6 @@ console.log("User layout");
   <ClientOnly>
     <NavUserNavbar />
   </ClientOnly>
+  <ToastContainer />
   <slot />
 </template>

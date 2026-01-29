@@ -16,6 +16,6 @@ console.log(isLoggedInn);
  -->
 <template>
   <ClientOnly> <NavPublicNavbar /> </ClientOnly>
-
+  <ToastContainer />
   <slot />
 </template>

@@ -14,14 +14,14 @@ const emit = defineEmits<{
   <div class="bg-white rounded-none overflow-hidden shadow-none border border-slate-200 transition-all duration-200 ease-out cursor-pointer flex flex-col relative hover:-translate-y-1 hover:shadow-[4px_4px_0_0_var(--color-primary)] hover:border-primary group">
     <div class="h-[320px] relative overflow-hidden border-b border-slate-200">
       <img
-        :src="product.image"
-        :alt="product.title || 'Product image'"
+        :src="product.image || '/placeholder.jpg'"
+        :alt="product.name || 'Product image'"
         loading="lazy"
         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
       />
     </div>
     <div class="p-5 bg-white flex flex-col justify-between grow">
-      <h3 class="text-lg font-bold mb-4 text-primary -tracking-[0.01em]">{{ product.title }}</h3>
+      <h3 class="text-lg font-bold mb-4 text-primary -tracking-[0.01em]">{{ product.name }}</h3>
       <div class="flex justify-between items-center mt-auto">
         <span class="font-semibold text-slate-600 text-base font-mono">{{ product.price }}</span>
         <button

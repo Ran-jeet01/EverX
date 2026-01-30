@@ -12,15 +12,14 @@ const loading = ref(true);
 
 // Add to cart handler
 const handleAddToCart = (product: ProductDataType) => {
-  const cartItem: CartItem = { ...product, quantity: 1 };
-  cartStore.addToCart(cartItem);
+  cartStore.addToCart(product);
 };
 
-// Fetch products on mount (client-side only)
+// Fetch products on mount (client side )
 onMounted(async () => {
   loading.value = true;
   try {
-    await productsStore.loadProducts();
+    await productsStore.loadProducts("All");
     products.value = productsStore.products;
   } catch (error) {
     console.error("Failed to load products:", error);

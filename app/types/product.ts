@@ -1,16 +1,21 @@
 interface ProductDataType {
-  id: number;
-  title: string;
+  id: string; // Changed from number to string (UUID)
+  name: string; // Changed from title to name
   price: number;
-  description: string;
+  description: string | null;
   category: string;
-  image: string;
-  rating: { rate: number; count: number };
+  image: string | null;
+  stock: number;
+  status: string;
 }
+
 interface ReqProduct {
-  title: string;
+  name: string;
   price: string | number;
-  image: string;
+  image: string | null;
+  category: string;
+  stock: number;
+  description?: string;
 }
 type ProductResponse = ProductDataType[];
 

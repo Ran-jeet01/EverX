@@ -21,6 +21,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   if (user.value.role === "admin") {
     to.meta.layout = "admin";
   } else {
-    to.meta.layout = "user"; // Or 'app', checking user request "user.vue layout"
+    to.meta.layout = "user";
   }
 });

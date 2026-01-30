@@ -1,4 +1,5 @@
 import { users } from "../../db/schema";
+import { db } from "../../utils/drizzle";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -47,14 +48,22 @@ export default defineEventHandler(async (event) => {
       email,
       password: hashedPassword,
       name,
-      role: "user ", // Explicitly setting it as requested
+      role: "user", // Explicitly setting it as requested
     })
     .returning();
 
+  const user = newUser[0];
+  if (!user) {
+    throw createError({
+      statusCode: 500,
+      message: "Failed to create user",
+    });
+  }
+
   return {
-    id: newUser[0].id,
-    email: newUser[0].email,
-    name: newUser[0].name,
-    role: newUser[0].role,
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
   };
 });

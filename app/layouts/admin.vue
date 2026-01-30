@@ -1,5 +1,18 @@
 <script setup lang="ts">
-import { ref } from "vue";
+const { user, logout } = useAuth();
+
+const userInitials = computed(() => {
+  const name = user.value?.name;
+  if (!name) return "??";
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0];
+  const last = parts[parts.length - 1];
+  
+  if (parts.length >= 2 && first && last) {
+    return (first.charAt(0) + last.charAt(0)).toUpperCase();
+  }
+  return first ? first.charAt(0).toUpperCase() : "?";
+});
 
 const isSidebarOpen = ref(true);
 
@@ -8,7 +21,7 @@ const toggleSidebar = () => {
 };
 
 const handleLogout = () => {
-  console.log("Logout clicked");
+  logout();
 };
 </script>
 
@@ -24,11 +37,12 @@ const handleLogout = () => {
       ></div>
 
       <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <ToastContainer />
         <AdminNavbar
           @toggle-sidebar="toggleSidebar"
-          user-name="Ranjit Poudel"
-          user-role="Administrator"
-          user-initials="RP"
+          :user-name="user?.name || 'User'"
+          :user-role="user?.role || 'Guest'"
+          :user-initials="userInitials"
         />
 
         <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-10 scroll-smooth">

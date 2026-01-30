@@ -9,11 +9,13 @@ export const useProductsStore = defineStore("products", () => {
   const loading = ref(false);
   const error = ref<string | null>(null);
 
-  const loadProducts = async () => {
-    if (products.value.length) return;
+  const loadProducts = async (category?: string) => {
+    // If we already have products and NO category filter is requested, don't refetch
+    if (products.value.length && !category) return;
+
     loading.value = true;
     try {
-      products.value = await fetchProducts();
+      products.value = await fetchProducts(category);
     } catch (err) {
       error.value = "Failed to load products";
     } finally {

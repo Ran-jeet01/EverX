@@ -17,6 +17,10 @@ export default defineEventHandler(async (event) => {
             .where(eq(users.id, id))
             .returning();
 
+        if (!updatedUser) {
+            throw createError({ statusCode: 404, message: 'User not found' });
+        }
+
         const { password, ...safeUser } = updatedUser;
         return safeUser;
     } catch (e) {

@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 401, message: 'Unauthenticated' });
     }
 
-    const payload = verifyToken(token);
+    const payload = verifyToken(token) as any;
     if (!payload || typeof payload === 'string' || !payload.id) {
         throw createError({ statusCode: 401, message: 'Invalid token' });
     }
@@ -34,13 +34,14 @@ export default defineEventHandler(async (event) => {
         );
         const existing = await db.select().from(cartItems).where(existingArgs).limit(1);
 
-        if (existing.length > 0) {
+        const firstExisting = existing[0];
+        if (firstExisting) {
             // Update quantity
-            const newQuantity = existing[0].quantity! + (quantity || 1);
+            const newQuantity = (firstExisting.quantity || 0) + (quantity || 1);
             const [updatedItem] = await db
                 .update(cartItems)
                 .set({ quantity: newQuantity })
-                .where(eq(cartItems.id, existing[0].id))
+                .where(eq(cartItems.id, firstExisting.id))
                 .returning();
             return updatedItem;
         } else {
@@ -61,8 +62,8 @@ export default defineEventHandler(async (event) => {
         const { id, quantity } = body;
 
         // Verify ownership
-        const item = await db.select().from(cartItems).where(eq(cartItems.id, id)).limit(1);
-        if (!item.length || item[0].userId !== userId) {
+        const [firstItem] = await db.select().from(cartItems).where(eq(cartItems.id, id)).limit(1);
+        if (!firstItem || firstItem.userId !== userId) {
             throw createError({ statusCode: 403, message: 'Forbidden' });
         }
 
@@ -75,11 +76,11 @@ export default defineEventHandler(async (event) => {
         const id = Number(query.id);
 
         // Verify ownership
-        const item = await db.select().from(cartItems).where(eq(cartItems.id, id)).limit(1);
-        if (!item.length || item[0].userId !== userId) {
+        const [firstItem] = await db.select().from(cartItems).where(eq(cartItems.id, id)).limit(1);
+        if (!firstItem || firstItem.userId !== userId) {
             // If item doesn't exist, we can just return success or 404, but ownership check is key.
             // If item not found, 404 is appropriate.
-            if (!item.length) throw createError({ statusCode: 404, message: 'Not found' });
+            if (!firstItem) throw createError({ statusCode: 404, message: 'Not found' });
             throw createError({ statusCode: 403, message: 'Forbidden' });
         }
 

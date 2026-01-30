@@ -12,16 +12,25 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const payload = verifyToken(token);
-    if (!payload) {
+    const payload = verifyToken(token) as any;
+    if (!payload || !payload.id) {
         throw createError({
             statusCode: 401,
             statusMessage: 'Invalid token',
         });
     }
 
+    // Validate UUID format to prevent DB errors
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(payload.id)) {
+        throw createError({
+            statusCode: 401,
+            statusMessage: 'Invalid session format. Please log in again.',
+        });
+    }
+
     // (Optional) Fetch fresh user data from DB to ensure role/status is up to date
-    const userResult = await db.select().from(users).where(eq(users.id, (payload as any).id)).limit(1);
+    const userResult = await db.select().from(users).where(eq(users.id, payload.id)).limit(1);
     const user = userResult[0];
 
     if (!user) {

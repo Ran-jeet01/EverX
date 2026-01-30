@@ -3,10 +3,12 @@ definePageMeta({
   layout: "admin",
 });
 
-const stats = [
+const { data: statsData } = useFetch('/api/admin/stats');
+
+const stats = computed(() => [
   {
     title: "Total Users",
-    value: "1,234",
+    value: statsData.value?.totalUsers?.toLocaleString() || "0",
     icon: "👤󠅄",
     change: "+12%",
     trend: "up",
@@ -14,7 +16,7 @@ const stats = [
   },
   {
     title: "Revenue",
-    value: "$12,345",
+    value: `$${statsData.value?.revenue?.toLocaleString() || "0"}`,
     icon: "💰",
     change: "+5.4%",
     trend: "up",
@@ -22,7 +24,7 @@ const stats = [
   },
   {
     title: "Active Sessions",
-    value: "45",
+    value: statsData.value?.activeSessions?.toLocaleString() || "0",
     icon: "⚡",
     change: "-2%",
     trend: "down",
@@ -30,13 +32,13 @@ const stats = [
   },
   {
     title: "Products",
-    value: "89",
+    value: statsData.value?.totalProducts?.toLocaleString() || "0",
     icon: "📦",
     change: "+8",
     trend: "up",
     color: "#8b5cf6",
   },
-];
+]);
 
 const series = [
   {

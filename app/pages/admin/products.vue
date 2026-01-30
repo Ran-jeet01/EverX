@@ -6,50 +6,51 @@ definePageMeta({
 });
 
 interface Product {
-  id: number;
+  id: string; // Changed to string for UUID
   name: string;
-  price: number;
+  price: string | number;
   category: string;
   stock: number;
-  status: "In Stock" | "Out of Stock";
+  status: string;
   description: string;
   image: string | null;
 }
 
 // Fetch products from API
 const {
-  data: productData,
+  data: products,
   pending,
   error,
+  refresh,
 } = await useFetch<Product[]>("/api/product/products");
 
-// Use the fetched data directly
-const products = productData;
+const isSaving = ref(false);
+const isEditing = ref(false);
 
 // Form state
 const defaultFormState = {
   name: "",
-  price: 0,
-  category: "Electronics",
+  price: 0 as number | string,
+  category: "Tshirt",
   description: "",
   stock: 0,
-  status: "In Stock" as "In Stock" | "Out of Stock",
+  status: "In Stock" as string,
   image: null as string | null,
 };
 
 const productForm = ref({ ...defaultFormState });
 const showForm = ref(false);
-const isEditing = ref(false);
-const editingId = ref<number | null>(null);
+const editingId = ref<string | null>(null);
 const imagePreview = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
+const selectedFile = ref<File | null>(null);
 
 const handleImageUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files[0]) {
+    selectedFile.value = target.files[0];
     const url = URL.createObjectURL(target.files[0]);
     imagePreview.value = url;
-    productForm.value.image = url;
   }
 };
 
@@ -58,6 +59,7 @@ const triggerFileInput = () => fileInput.value?.click();
 const resetForm = () => {
   productForm.value = { ...defaultFormState };
   imagePreview.value = null;
+  selectedFile.value = null;
   isEditing.value = false;
   editingId.value = null;
 };
@@ -68,43 +70,70 @@ const toggleForm = () => {
 };
 
 const editProduct = (product: Product) => {
-  productForm.value = { ...product };
+  productForm.value = {
+    name: product.name,
+    price: Number(product.price),
+    category: product.category,
+    description: product.description || "",
+    stock: product.stock,
+    status: product.status,
+    image: product.image,
+  };
   imagePreview.value = product.image;
   isEditing.value = true;
   editingId.value = product.id;
   showForm.value = true;
 };
 
-const saveProduct = () => {
-  // just for client side
-  if (isEditing.value && editingId.value !== null) {
-    const index = products.value?.findIndex((p) => p.id === editingId.value);
-    if (index !== undefined && index !== -1 && products.value) {
-      products.value[index] = {
-        ...productForm.value,
-        id: editingId.value,
-        status: productForm.value.stock > 0 ? "In Stock" : "Out of Stock",
-      };
+const saveProduct = async () => {
+  isSaving.value = true;
+  try {
+    const formData = new FormData();
+    formData.append("name", productForm.value.name);
+    formData.append("price", productForm.value.price.toString());
+    formData.append("category", productForm.value.category);
+    formData.append("stock", productForm.value.stock.toString());
+    formData.append("description", productForm.value.description);
+    
+    if (selectedFile.value) {
+      formData.append("image", selectedFile.value);
+    } else if (productForm.value.image) {
+      formData.append("image", productForm.value.image);
     }
-  } else {
-    const newId = Math.max(...(products.value?.map((p) => p.id) || [0]), 0) + 1;
-    products.value?.push({
-      ...productForm.value,
-      id: newId,
-      status: productForm.value.stock > 0 ? "In Stock" : "Out of Stock",
-    });
+
+    if (isEditing.value && editingId.value !== null) {
+      formData.append("id", editingId.value);
+      await $fetch("/api/product/products", {
+        method: "PUT",
+        body: formData,
+      });
+    } else {
+      await $fetch("/api/product/products", {
+        method: "POST",
+        body: formData,
+      });
+    }
+    await refresh();
+    showForm.value = false;
+    resetForm();
+  } catch (err: any) {
+    alert(err.data?.message || "Failed to save product");
+  } finally {
+    isSaving.value = false;
   }
-  showForm.value = false;
-  resetForm();
 };
 
-const deleteProduct = (id: number) => {
+const deleteProduct = async (id: string) => {
   if (!confirm("Delete this product?")) return;
 
-  if (products.value) {
-    products.value = products.value.filter((p) => p.id !== id);
+  try {
+    await $fetch(`/api/product/products?id=${id}`, {
+      method: "DELETE",
+    });
+    await refresh();
+  } catch (err: any) {
+    alert(err.data?.message || "Failed to delete product");
   }
-  resetForm();
 };
 </script>
 
@@ -250,10 +279,10 @@ const deleteProduct = (id: number) => {
                   v-model="productForm.category"
                   class="w-full px-5 py-4 rounded-2xl bg-cyan-50 border-none text-slate-800 focus:ring-2 focus:ring-cyan-500 transition-all outline-none appearance-none"
                 >
-                  <option>Electronics</option>
-                  <option>Furniture</option>
-                  <option>Accessories</option>
-                  <option>Clothing</option>
+                  <option>Hoodie</option>
+                  <option>Tshirt</option>
+                  <option>Pant</option>
+                  <option>Jacket</option>
                 </select>
               </div>
               <div>
@@ -283,9 +312,37 @@ const deleteProduct = (id: number) => {
               >
                 <button
                   type="submit"
-                  class="bg-cyan-500 hover:bg-cyan-600 text-white px-10 py-4 rounded-[1.5rem] font-bold transition-all shadow-xl shadow-cyan-500/30 w-full sm:w-auto"
+                  class="bg-cyan-500 hover:bg-cyan-600 text-white px-10 py-4 rounded-[1.5rem] font-bold transition-all shadow-xl shadow-cyan-500/30 w-full sm:w-auto flex items-center justify-center gap-2"
+                  :disabled="isSaving"
                 >
-                  {{ isEditing ? "Update Item" : "Create Listing" }}
+                  <svg
+                    v-if="isSaving"
+                    class="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  {{
+                    isSaving
+                      ? "Processing..."
+                      : isEditing
+                      ? "Update Item"
+                      : "Create Listing"
+                  }}
                 </button>
               </div>
             </div>
@@ -360,7 +417,7 @@ const deleteProduct = (id: number) => {
                   >
                 </td>
                 <td class="px-10 py-8 font-extrabold text-cyan-600 text-lg">
-                  ${{ product.price.toFixed(2) }}
+                  ${{ Number(product.price).toFixed(2) }}
                 </td>
                 <td class="px-10 py-8">
                   <span

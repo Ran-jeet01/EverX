@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 const RUNTIME_CONFIG = useRuntimeConfig();
-const JWT_SECRET = RUNTIME_CONFIG.JWT_SECRET || 'default_secret_please_change';
+const JWT_SECRET = (RUNTIME_CONFIG.JWT_SECRET || 'default_secret_please_change') as string;
 
 export const signToken = (payload: object) => {
     return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });

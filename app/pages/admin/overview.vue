@@ -118,15 +118,15 @@ const chartOptions = {
         </p>
       </div>
       <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-        <button
+        <!-- <button
           class="px-4 py-2 bg-white border border-cyan-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-cyan-50 transition-colors shadow-sm flex-1 sm:flex-none"
         >
-          Download Report
-        </button>
+         Today's Stats
+        </button> -->
         <button
           class="px-4 py-2 bg-cyan-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-cyan-500/30 hover:bg-cyan-600 transition-all flex-1 sm:flex-none"
         >
-          Today's Stats
+            Download Report
         </button>
       </div>
     </div>

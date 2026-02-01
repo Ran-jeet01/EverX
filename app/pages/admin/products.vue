@@ -44,6 +44,7 @@ const editingId = ref<string | null>(null);
 const imagePreview = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const selectedFile = ref<File | null>(null);
+const formContainer = ref<HTMLElement | null>(null);
 
 const handleImageUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
@@ -83,6 +84,11 @@ const editProduct = (product: Product) => {
   isEditing.value = true;
   editingId.value = product.id;
   showForm.value = true;
+  
+  // Scroll to form
+  nextTick(() => {
+    formContainer.value?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 };
 
 const saveProduct = async () => {
@@ -102,12 +108,33 @@ const saveProduct = async () => {
     }
 
     if (isEditing.value && editingId.value !== null) {
-      formData.append("id", editingId.value);
-      await $fetch("/api/product/products", {
-        method: "PUT",
-        body: formData,
-      });
+      if (!selectedFile.value) {
+        // Send JSON for updates without file
+        await $fetch("/api/product/products", {
+            method: "PUT",
+            body: {
+                id: editingId.value,
+                name: productForm.value.name,
+                price: productForm.value.price,
+                category: productForm.value.category,
+                stock: productForm.value.stock,
+                description: productForm.value.description,
+                image: productForm.value.image
+            },
+        });
+      } else {
+        // Send FormData with file
+        formData.append("id", editingId.value);
+        await $fetch("/api/product/products", {
+            method: "PUT",
+            body: formData,
+        });
+      }
     } else {
+      // Create new - keep using formData if file exists, or JSON?
+      // For simplicity, let's use FormData only if file exists, but creation usually needs an image.
+      // If we made image optional, we could use JSON.
+      // Let's stick to FormData for creation as it likely involves upload.
       await $fetch("/api/product/products", {
         method: "POST",
         body: formData,
@@ -182,6 +209,7 @@ const deleteProduct = async (id: string) => {
       <!-- Product Form -->
       <div
         v-if="showForm"
+        ref="formContainer"
         class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-xl border border-cyan-100 mb-12 animate-fade-in-down"
       >
         <h3 class="text-xl font-bold mb-10 text-slate-800">

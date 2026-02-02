@@ -3,6 +3,7 @@ interface UserState {
   email: string;
   name: string | null;
   role: string;
+  address?: string | null;
 }
 
 interface LoginCredentials {
@@ -83,5 +84,6 @@ export const useAuth = () => {
     register,
     logout,
     initAuth,
+    fetchUser: initAuth, // Alias for consistency
   };
 };

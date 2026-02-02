@@ -28,7 +28,7 @@ const handleLogout = () => {
 <template>
   <ClientOnly>
     <div class="flex h-screen bg-cyan-50 font-sans overflow-hidden relative">
-      <AdminSidebar :is-open="isSidebarOpen" @logout="handleLogout" />
+      <AdminSidebar :is-open="isSidebarOpen" @logout="handleLogout" @toggle="toggleSidebar" />
 
       <div
         v-if="isSidebarOpen"

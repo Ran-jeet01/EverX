@@ -46,6 +46,19 @@
         </div>
       </div>
 
+      <div class="form-group">
+        <label for="address">Address</label>
+        <div class="input-wrapper">
+          <input
+            v-model="form.address"
+            type="text"
+            id="address"
+            placeholder="123 Main St, City, Country"
+            required
+          />
+        </div>
+      </div>
+
       <div class="terms">
         <input type="checkbox" id="terms" required />
         <label for="terms"
@@ -80,6 +93,7 @@ const form = reactive({
   name: "",
   email: "",
   password: "",
+  address: "",
 });
 const loading = ref(false);
 const error = ref("");

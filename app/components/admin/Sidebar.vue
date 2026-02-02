@@ -43,7 +43,30 @@ const links: SidebarLink[] = [
     path: "/admin/sales",
     icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
   },
+  {
+    name: "Orders",
+    path: "/admin/orders",
+    icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2",
+  },
 ];
+
+const handleLinkClick = () => {
+  // Only close if on mobile/small screen (checked via logic or just unconditionally emit toggle since toggle handles open/close)
+  // Assuming 'toggle' flips the isOpen prop in the parent.
+  // Ideally, we should know if we are on mobile. 
+  // However, often 'toggle' is just used to close sidebar on mobile.
+  // The layout controls isOpen. If we are on desktop, isOpen might be permanent or toggleable.
+  // If we are on mobile (where Sidebar overlaps), we definitely want to close.
+  // Let's emit 'toggle' which usually means 'change state'. If desktop is always open, parent ignores it or re-opens.
+  // Better approach: check window width or use a prop.
+  // For now, let's emit 'toggle' and assume parent handles the logic or we just close.
+  // Wait, the user specifically asked "sidebar automatically goes off".
+  // If `isOpen` is true, we want to set it to false.
+  // But we don't own `isOpen`. We emit `toggle`.
+  if (window.innerWidth < 1024) { // Simple check for mobile/tablet breakpoint
+      emit("toggle");
+  }
+};
 
 const handleLogout = () => {
   emit("logout");
@@ -81,6 +104,7 @@ const handleLogout = () => {
                 ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/30'
                 : 'text-slate-600 hover:bg-cyan-50 hover:text-cyan-600'
             "
+            @click="handleLinkClick"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

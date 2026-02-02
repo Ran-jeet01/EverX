@@ -13,9 +13,39 @@ const cartStore = useCartStore();
 const cartItems = computed(() => cartStore.items);
 console.log(cartItems.value);
 
+const checkoutLoading = ref(false);
+const router = useRouter();
+
 onMounted(async () => {
     await cartStore.loadCart();
 });
+
+const { user } = useAuth();
+
+const handleCheckout = async () => {
+    if (cartItems.value.length === 0) return;
+    
+    // Check if user has address
+    if (!user.value?.address) {
+        alert('Please add a shipping address to your profile before checking out.');
+        router.push('/account/profile');
+        return;
+    }
+
+    checkoutLoading.value = true;
+    try {
+        await $fetch('/api/orders', { method: 'POST' });
+        await cartStore.loadCart(); // Clear cart state
+        router.push('/account/orders'); // Redirect to orders page
+    } catch (e: any) {
+        alert(e.data?.message || 'Checkout failed');
+        if (e.statusCode === 401) {
+             router.push('/auth/login');
+        }
+    } finally {
+        checkoutLoading.value = false;
+    }
+};
 </script>
 
 <template>
@@ -95,10 +125,11 @@ onMounted(async () => {
           <span>${{ cartStore.totalPrice }}</span>
         </div>
         <button
-          @click="cartStore.clearCart"
-          class="btn btn-primary w-full mt-6 flex justify-center"
+          @click="handleCheckout"
+          :disabled="checkoutLoading"
+          class="btn btn-primary w-full mt-6 flex justify-center py-4 bg-black text-white font-bold hover:bg-gray-800 disabled:bg-gray-400"
         >
-          Proceed to Checkout
+          {{ checkoutLoading ? 'Processing...' : 'Proceed to Checkout' }}
         </button>
       </div>
     </div>

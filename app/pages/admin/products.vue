@@ -22,7 +22,7 @@ const {
   pending,
   error,
   refresh,
-} = await useFetch<Product[]>("/api/product/products");
+} = await useFetch<Product[]>("/api/products");
 
 const isSaving = ref(false);
 const isEditing = ref(false);
@@ -110,10 +110,9 @@ const saveProduct = async () => {
     if (isEditing.value && editingId.value !== null) {
       if (!selectedFile.value) {
         // Send JSON for updates without file
-        await $fetch("/api/product/products", {
+        await $fetch(`/api/products/${editingId.value}`, {
             method: "PUT",
             body: {
-                id: editingId.value,
                 name: productForm.value.name,
                 price: productForm.value.price,
                 category: productForm.value.category,
@@ -125,7 +124,7 @@ const saveProduct = async () => {
       } else {
         // Send FormData with file
         formData.append("id", editingId.value);
-        await $fetch("/api/product/products", {
+        await $fetch(`/api/products/${editingId.value}`, {
             method: "PUT",
             body: formData,
         });
@@ -135,7 +134,7 @@ const saveProduct = async () => {
       // For simplicity, let's use FormData only if file exists, but creation usually needs an image.
       // If we made image optional, we could use JSON.
       // Let's stick to FormData for creation as it likely involves upload.
-      await $fetch("/api/product/products", {
+      await $fetch("/api/products", {
         method: "POST",
         body: formData,
       });
@@ -154,7 +153,7 @@ const deleteProduct = async (id: string) => {
   if (!confirm("Delete this product?")) return;
 
   try {
-    await $fetch(`/api/product/products?id=${id}`, {
+    await $fetch(`/api/products/${id}`, {
       method: "DELETE",
     });
     await refresh();

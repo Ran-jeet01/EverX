@@ -1,10 +1,12 @@
-import { checkAndCreateTable } from "../utils/db";
+import { db } from "../utils/drizzle";
+import { sql } from "drizzle-orm";
 
 export default defineNitroPlugin(async () => {
   try {
-    await checkAndCreateTable();
-  } catch (err) {
-    console.error("Cannot start server without DB connection. Exiting...");
-    process.exit(1); // stop Nuxt if DB fails
+    await db.execute(sql`SELECT 1`);
+    console.log("Database connected successfully");
+  } catch (err: any) {
+    console.error("Database connection failed:", err.message);
+
   }
 });

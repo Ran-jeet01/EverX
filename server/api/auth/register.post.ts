@@ -8,6 +8,7 @@ const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   name: z.string().optional(),
+  address: z.string().optional(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -22,7 +23,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const { email, password, name } = result.data;
+  const { email, password, name, address } = result.data;
 
   // Check if user exists
   const existingUser = await db
@@ -48,6 +49,7 @@ export default defineEventHandler(async (event) => {
       email,
       password: hashedPassword,
       name,
+      address,
       role: "user", // Explicitly setting it as requested
     })
     .returning();

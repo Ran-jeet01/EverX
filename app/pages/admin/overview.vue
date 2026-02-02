@@ -3,7 +3,7 @@ definePageMeta({
   layout: "admin",
 });
 
-const { data: statsData } = useFetch('/api/admin/stats');
+const { data: statsData } = useFetch("/api/admin/stats");
 
 const stats = computed(() => [
   {
@@ -23,8 +23,8 @@ const stats = computed(() => [
     color: "#10b981",
   },
   {
-    title: "Active Sessions",
-    value: statsData.value?.activeSessions?.toLocaleString() || "0",
+    title: "No of Product Ordered",
+    value: statsData.value?.totalOrderedProduct?.toLocaleString() || "0",
     icon: "⚡",
     change: "-2%",
     trend: "down",
@@ -40,12 +40,12 @@ const stats = computed(() => [
   },
 ]);
 
-const series = [
+const series = computed(() => [
   {
     name: "Active Activity",
-    data: [44, 55, 57, 56, 61, 58, 63, 60, 66, 70, 75, 100],
+    data: statsData.value?.salesByMonth ?? [],
   },
-];
+]);
 
 const chartOptions = {
   chart: {
@@ -84,7 +84,7 @@ const chartOptions = {
       "Sep",
       "Oct",
       "Nov",
-      "Dc",
+      "Dec",
     ],
     axisBorder: { show: false },
     axisTicks: { show: false },
@@ -126,7 +126,7 @@ const chartOptions = {
         <button
           class="px-4 py-2 bg-cyan-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-cyan-500/30 hover:bg-cyan-600 transition-all flex-1 sm:flex-none"
         >
-            Download Report
+          Download Report
         </button>
       </div>
     </div>
@@ -180,7 +180,9 @@ const chartOptions = {
       <div
         class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4"
       >
-        <h3 class="text-xl font-bold text-slate-800">Active Activity</h3>
+        <h3 class="text-xl font-bold text-slate-800">
+          Monthly Product Order Volume
+        </h3>
         <div class="flex gap-2">
           <!-- <span class="h-2 w-2 rounded-full bg-cyan-500"></span>
           <span class="h-2 w-2 rounded-full bg-slate-200"></span> -->

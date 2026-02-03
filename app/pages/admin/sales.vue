@@ -3,16 +3,18 @@ definePageMeta({
   layout: "admin",
 });
 
-const revenueSeries = [
+const { data: statsData } = useFetch("/api/admin/stats");
+
+const revenueSeries = computed(() => [
   {
     name: "This Year",
-    data: [31000, 40000, 28000, 51000, 42000, 109000, 100000],
+    data: statsData.value?.monthlyRevenue || [],
   },
   {
-    name: "Previous",
-    data: [11000, 32000, 45000, 32000, 34000, 52000, 41000],
+    name: "Previous Year",
+    data: statsData.value?.previousMonthlyRevenue || [],
   },
-];
+]);
 
 const revenueChartOptions = {
   chart: {
@@ -34,7 +36,20 @@ const revenueChartOptions = {
     },
   },
   xaxis: {
-    categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
+    categories: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
     axisBorder: { show: false },
     axisTicks: { show: false },
     labels: { style: { colors: "#94a3b8" } },
@@ -47,15 +62,18 @@ const revenueChartOptions = {
   },
 };
 
-const ordersSeries = [44, 55, 13, 33];
+const ordersSeries = computed(() => {
+  return statsData.value?.salesByCategory?.map((item: any) => item.sales) || [];
+});
 
-const ordersChartOptions = {
+const ordersChartOptions = computed(() => ({
   chart: {
     type: "donut",
     fontFamily: "inherit",
     animations: { enabled: true },
   },
-  labels: ["Pant", "TShirt", "Jacket", "Hoodie"],
+  labels:
+    statsData.value?.salesByCategory?.map((item: any) => item.category) || [],
   colors: ["#06b6d4", "#8b5cf6", "#f59e0b", "#10b981"],
   plotOptions: {
     pie: {
@@ -78,7 +96,7 @@ const ordersChartOptions = {
   stroke: { show: false },
   legend: { position: "bottom", fontFamily: "inherit" },
   tooltip: { theme: "light" },
-};
+}));
 </script>
 
 <template>

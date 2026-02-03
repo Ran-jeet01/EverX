@@ -18,6 +18,8 @@ const isEditing = ref(false);
 const editingUser = ref<User | null>(null);
 const selectedRole = ref<User["role"]>("User");
 
+const { user: currentUser } = useAuth();
+
 // Fetch users from API
 const { data, pending, error } = useFetch<User[]>("/api/user/users");
 
@@ -154,6 +156,10 @@ const deleteUser = async (id: string) => {
               v-for="user in filteredUsers"
               :key="user.id"
               class="hover:bg-cyan-50/30 transition-colors"
+              :class="{
+                'bg-cyan-50/60 border-l-4 border-cyan-500':
+                  user.id === currentUser?.id,
+              }"
             >
               <td class="px-10 py-8 flex items-center gap-5">
                 <div
@@ -161,7 +167,14 @@ const deleteUser = async (id: string) => {
                 >
                   {{ (user.name || user.email).charAt(0).toUpperCase() }}
                 </div>
-                <span class="font-bold text-slate-800">{{ user.name || 'Unknown' }}</span>
+                <span class="font-bold text-slate-800"
+                  >{{ user.name || "Unknown" }}
+                  <span
+                    v-if="user.id === currentUser?.id"
+                    class="ml-2 text-xs text-cyan-500 bg-cyan-100 px-2 py-0.5 rounded-full"
+                    >You</span
+                  ></span
+                >
               </td>
               <td class="px-10 py-8 text-slate-500 font-medium text-sm">
                 {{ user.email }}
@@ -179,12 +192,14 @@ const deleteUser = async (id: string) => {
               </td>
               <td class="px-10 py-8 text-right space-x-2">
                 <button
+                  v-if="user.id !== currentUser?.id"
                   @click="openEditModal(user)"
                   class="px-5 py-2 text-xs font-bold text-slate-600 hover:bg-cyan-50 rounded-xl border border-cyan-200 transition-all"
                 >
                   Assign Role
                 </button>
                 <button
+                  v-if="user.id !== currentUser?.id"
                   @click="deleteUser(user.id)"
                   class="p-2 text-slate-300 hover:text-rose-500 transition-colors"
                 >

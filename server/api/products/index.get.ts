@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
       .orderBy(desc(products.createdAt));
 
     if (category && category !== "All") {
-      //    @ts-ignore
+      //  @ts-ignore
       productQuery = db
         .select()
         .from(products)

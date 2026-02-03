@@ -19,11 +19,11 @@ export default defineEventHandler(async (event) => {
     const productsRaw = await $fetch("/api/products");
     const totalProducts = (productsRaw as any[]).length;
     // for total numbe of Ordered product
-    const [orderedProduct] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(orderItems);
-    const totalOrderedProduct = Number(orderedProduct.count);
-    // total revenue
+    // const [orderedProduct] = await db
+    //   .select({ count: sql<number>`count(*)` })
+    //   .from(orderItems);
+    // const totalOrderedProduct = Number(orderedProduct.count);
+    // // total revenue
     const [rev] = await db
       .select({
         totalRevenue: sql<number>`SUM(${orderItems.quantity} * ${orderItems.price})`,
@@ -46,7 +46,12 @@ export default defineEventHandler(async (event) => {
     const salesByMonth = Array(12).fill(0);
     rows.forEach((r) => (salesByMonth[Number(r.m) - 1] = Number(r.q)));
 
-    // return arr;
+    // total product calculation (logic:Sum of product of all the month)
+
+    const totalOrderedProduct = Number(
+      salesByMonth.reduce((acc, curr) => acc + curr, 0),
+    );
+
     console.log(salesByMonth, "hey");
 
     return {

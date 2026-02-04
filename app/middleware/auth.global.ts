@@ -1,7 +1,7 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const { user, initAuth } = useAuth();
   // Ensure auth state is initialized (client-side handling mostly)
-  if (!user.value && import.meta.client) {
+  if (!user.value) {
     await initAuth();
   }
 

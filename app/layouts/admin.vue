@@ -7,7 +7,7 @@ const userInitials = computed(() => {
   const parts = name.trim().split(/\s+/);
   const first = parts[0];
   const last = parts[parts.length - 1];
-  
+
   if (parts.length >= 2 && first && last) {
     return (first.charAt(0) + last.charAt(0)).toUpperCase();
   }
@@ -28,7 +28,11 @@ const handleLogout = () => {
 <template>
   <ClientOnly>
     <div class="flex h-screen bg-cyan-50 font-sans overflow-hidden relative">
-      <AdminSidebar :is-open="isSidebarOpen" @logout="handleLogout" @toggle="toggleSidebar" />
+      <AdminSidebar
+        :is-open="isSidebarOpen"
+        @logout="handleLogout"
+        @toggle="toggleSidebar"
+      />
 
       <div
         v-if="isSidebarOpen"

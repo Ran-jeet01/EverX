@@ -64,8 +64,11 @@ export const useAuth = () => {
 
   const initAuth = async () => {
     try {
+      // check and authorize in serverside
+      const headers = useRequestHeaders(["cookie"]);
       const data = await $fetch<UserState>("/api/auth/me", {
         retry: 0,
+        headers,
       });
       user.value = data;
     } catch {

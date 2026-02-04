@@ -51,20 +51,8 @@ const links: SidebarLink[] = [
 ];
 
 const handleLinkClick = () => {
-  // Only close if on mobile/small screen (checked via logic or just unconditionally emit toggle since toggle handles open/close)
-  // Assuming 'toggle' flips the isOpen prop in the parent.
-  // Ideally, we should know if we are on mobile. 
-  // However, often 'toggle' is just used to close sidebar on mobile.
-  // The layout controls isOpen. If we are on desktop, isOpen might be permanent or toggleable.
-  // If we are on mobile (where Sidebar overlaps), we definitely want to close.
-  // Let's emit 'toggle' which usually means 'change state'. If desktop is always open, parent ignores it or re-opens.
-  // Better approach: check window width or use a prop.
-  // For now, let's emit 'toggle' and assume parent handles the logic or we just close.
-  // Wait, the user specifically asked "sidebar automatically goes off".
-  // If `isOpen` is true, we want to set it to false.
-  // But we don't own `isOpen`. We emit `toggle`.
-  if (window.innerWidth < 1024) { // Simple check for mobile/tablet breakpoint
-      emit("toggle");
+  if (window.innerWidth < 1024) {
+    emit("toggle");
   }
 };
 

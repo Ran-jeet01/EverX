@@ -26,35 +26,33 @@ const handleLogout = () => {
 </script>
 
 <template>
-  <ClientOnly>
-    <div class="flex h-screen bg-cyan-50 font-sans overflow-hidden relative">
-      <AdminSidebar
-        :is-open="isSidebarOpen"
-        @logout="handleLogout"
-        @toggle="toggleSidebar"
+  <div class="flex h-screen bg-cyan-50 font-sans overflow-hidden relative">
+    <AdminSidebar
+      :is-open="isSidebarOpen"
+      @logout="handleLogout"
+      @toggle="toggleSidebar"
+    />
+
+    <div
+      v-if="isSidebarOpen"
+      @click="toggleSidebar"
+      class="fixed inset-0 bg-black/50 z-10 lg:hidden"
+    ></div>
+
+    <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+      <ToastContainer />
+      <AdminNavbar
+        @toggle-sidebar="toggleSidebar"
+        :user-name="user?.name || 'User'"
+        :user-role="user?.role || 'Guest'"
+        :user-initials="userInitials"
       />
 
-      <div
-        v-if="isSidebarOpen"
-        @click="toggleSidebar"
-        class="fixed inset-0 bg-black/50 z-10 lg:hidden"
-      ></div>
-
-      <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        <ToastContainer />
-        <AdminNavbar
-          @toggle-sidebar="toggleSidebar"
-          :user-name="user?.name || 'User'"
-          :user-role="user?.role || 'Guest'"
-          :user-initials="userInitials"
-        />
-
-        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-10 scroll-smooth">
-          <div class="container mx-auto">
-            <slot />
-          </div>
-        </main>
-      </div>
+      <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-10 scroll-smooth">
+        <div class="container mx-auto">
+          <slot />
+        </div>
+      </main>
     </div>
-  </ClientOnly>
+  </div>
 </template>

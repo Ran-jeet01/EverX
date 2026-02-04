@@ -14,8 +14,6 @@ const y = ref(0);
 const showProfileMenu = ref(false);
 const showLogoutConfirm = ref(false);
 
-
-
 const solidNav = computed(
   () => y.value > 40 || !["/", "/about"].includes(route.path),
 );
@@ -35,7 +33,7 @@ watch(() => route.path, close);
 const handleLogout = async () => {
   showLogoutConfirm.value = false;
   await logout();
-  router.push('/auth/login');
+  router.push("/auth/login");
 };
 </script>
 
@@ -99,10 +97,10 @@ const handleLogout = async () => {
             @click="showProfileMenu = !showProfileMenu"
             class="flex items-center gap-2 text-white bg-transparent border-none cursor-pointer font-medium uppercase text-base opacity-90 hover:opacity-100"
           >
-            <span>{{ user.name || 'User' }}</span>
+            <span>{{ user.name || "User" }}</span>
             <Icon name="ri:user-3-line" size="20" />
           </button>
-          
+
           <!-- Dropdown Menu -->
           <div
             v-if="showProfileMenu"
@@ -123,13 +121,16 @@ const handleLogout = async () => {
               Orders
             </NuxtLink>
             <button
-              @click="showLogoutConfirm = true; showProfileMenu = false"
+              @click="
+                showLogoutConfirm = true;
+                showProfileMenu = false;
+              "
               class="px-4 py-3 hover:bg-[#333] transition-colors text-left w-full bg-transparent border-none text-red-400 text-sm uppercase tracking-wider cursor-pointer"
             >
               Logout
             </button>
           </div>
-          
+
           <!-- Overlay to close dropdown -->
           <div
             v-if="showProfileMenu"
@@ -137,7 +138,7 @@ const handleLogout = async () => {
             class="fixed inset-0 z-[1001] bg-transparent cursor-default"
           ></div>
         </div>
-        
+
         <NuxtLink
           v-else
           to="/auth/login"
@@ -183,7 +184,7 @@ const handleLogout = async () => {
         to="/products"
         class="text-white no-underline text-xl uppercase tracking-widest transition-colors flex items-center gap-2.5 hover:text-primary"
         @click="close"
-        >ProductU</NuxtLink
+        >Product</NuxtLink
       >
       <NuxtLink
         to="/about"
@@ -216,7 +217,10 @@ const handleLogout = async () => {
           My Orders
         </NuxtLink>
         <button
-          @click="showLogoutConfirm = true; close()"
+          @click="
+            showLogoutConfirm = true;
+            close();
+          "
           class="text-red-400 bg-transparent border-none text-left p-0 text-xl uppercase tracking-widest cursor-pointer hover:text-red-300 font-medium"
         >
           Logout
@@ -241,9 +245,13 @@ const handleLogout = async () => {
     v-if="showLogoutConfirm"
     class="fixed inset-0 bg-black/80 z-[2000] flex items-center justify-center backdrop-blur-sm"
   >
-    <div class="bg-[#1a1a1a] p-8 rounded-xl shadow-2xl text-white max-w-sm w-full mx-4 border border-[#333]">
+    <div
+      class="bg-[#1a1a1a] p-8 rounded-xl shadow-2xl text-white max-w-sm w-full mx-4 border border-[#333]"
+    >
       <h3 class="text-xl font-bold mb-4">Logout?</h3>
-      <p class="mb-8 text-gray-300">Are you sure you want to log out of your account?</p>
+      <p class="mb-8 text-gray-300">
+        Are you sure you want to log out of your account?
+      </p>
       <div class="flex justify-end gap-4">
         <button
           @click="showLogoutConfirm = false"

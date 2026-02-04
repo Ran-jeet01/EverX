@@ -1,5 +1,5 @@
 <template>
-  <ClientOnly> <NavPublicNavbar /> </ClientOnly>
+  <NavPublicNavbar />
   <ToastContainer />
   <slot />
 </template>

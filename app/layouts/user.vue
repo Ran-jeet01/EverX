@@ -3,9 +3,7 @@ console.log("User layout");
 </script>
 
 <template>
-  <ClientOnly>
-    <NavUserNavbar />
-  </ClientOnly>
+  <NavUserNavbar />
   <ToastContainer />
   <slot />
 </template>

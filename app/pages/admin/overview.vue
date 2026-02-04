@@ -1,9 +1,17 @@
 <script setup lang="ts">
+import { generateStatsReport } from "../../utils/reportGenerator";
+
 definePageMeta({
   layout: "admin",
 });
 
 const { data: statsData } = useFetch("/api/admin/stats");
+
+const handleDownloadReport = async () => {
+  if (statsData.value) {
+    await generateStatsReport(statsData.value);
+  }
+};
 
 const stats = computed(() => [
   {
@@ -124,6 +132,7 @@ const chartOptions = {
          Today's Stats
         </button> -->
         <button
+          @click="handleDownloadReport"
           class="px-4 py-2 bg-cyan-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-cyan-500/30 hover:bg-cyan-600 transition-all flex-1 sm:flex-none"
         >
           Download Report

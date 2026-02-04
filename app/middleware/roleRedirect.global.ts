@@ -1,9 +1,6 @@
 export default defineNuxtRouteMiddleware((to) => {
   const { isLoggedIn, isAdmin } = useAuth();
 
-  console.log("middleware");
-  console.log(isLoggedIn.value, "islogin");
-  console.log(isAdmin.value, "isadmin");
 
   // Guest user
   if (!isLoggedIn.value) {

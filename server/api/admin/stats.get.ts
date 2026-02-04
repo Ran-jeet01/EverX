@@ -53,8 +53,6 @@ export default defineEventHandler(async (event) => {
       salesByMonth.reduce((acc, curr) => acc + curr, 0),
     );
 
-    console.log(salesByMonth, "hey");
-
     // Monthly Revenue (Revenue by Month)
     const revenueRows = await db
       .select({
@@ -104,7 +102,6 @@ export default defineEventHandler(async (event) => {
       sales: Number(r.sales),
     }));
 
-    console.log(salesByMonth, "hey");
 
     return {
       totalUsers,

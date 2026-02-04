@@ -25,7 +25,6 @@ const { data, pending, error } = useFetch<User[]>("/api/user/users");
 
 // Use the fetched data directly (data is Ref<User[] | null>)
 const users = data;
-console.log(data);
 // Computed filtered users (safe against null)
 const filteredUsers = computed(() => {
   if (!users.value) return [];

@@ -9,6 +9,7 @@ export const orders = pgTable('orders', {
     total: decimal('total', { precision: 10, scale: 2 }).notNull(),
     status: text('status').default('pending').notNull(),
     address: text('address').notNull(),
+    transactionUuid: text('transaction_uuid'),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
 });

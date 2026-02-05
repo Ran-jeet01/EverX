@@ -34,16 +34,32 @@ const handleCheckout = async () => {
 
     checkoutLoading.value = true;
     try {
-        await $fetch('/api/orders', { method: 'POST' });
-        await cartStore.loadCart(); // Clear cart state
-        router.push('/account/orders'); // Redirect to orders page
+        // Initiate eSewa payment
+        const response: any = await $fetch('/api/checkout/initiate', { method: 'POST' });
+        
+        // Create a hidden form and submit it to eSewa
+        const form = document.createElement('form');
+        form.setAttribute('method', 'POST');
+        form.setAttribute('action', 'https://rc-epay.esewa.com.np/api/epay/main/v2/form');
+
+        for (const key in response) {
+            if (key === 'order_id') continue; // Don't send internal order_id to eSewa
+            const hiddenField = document.createElement('input');
+            hiddenField.setAttribute('type', 'hidden');
+            hiddenField.setAttribute('name', key);
+            hiddenField.setAttribute('value', response[key]);
+            form.appendChild(hiddenField);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
     } catch (e: any) {
         alert(e.data?.message || 'Checkout failed');
         if (e.statusCode === 401) {
              router.push('/auth/login');
         }
     } finally {
-        checkoutLoading.value = false;
+        // We don't set loading to false here because we're redirecting
     }
 };
 </script>
@@ -127,9 +143,9 @@ const handleCheckout = async () => {
         <button
           @click="handleCheckout"
           :disabled="checkoutLoading"
-          class="btn btn-primary w-full mt-6 flex justify-center py-4 bg-black text-white font-bold hover:bg-gray-800 disabled:bg-gray-400"
+          class="btn btn-primary w-full mt-6 flex justify-center py-4 bg-[#60bb46] text-white font-bold hover:bg-[#50a03a] disabled:bg-gray-400"
         >
-          {{ checkoutLoading ? 'Processing...' : 'Proceed to Checkout' }}
+          {{ checkoutLoading ? 'Processing...' : 'Pay with eSewa' }}
         </button>
       </div>
     </div>

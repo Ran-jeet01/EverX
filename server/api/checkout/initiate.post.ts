@@ -2,7 +2,7 @@ import { defineEventHandler, createError } from "h3";
 import { db } from "../../utils/drizzle";
 import { orders, orderItems, cartItems, products } from "../../db/schema";
 import { eq } from "drizzle-orm";
-import crypto from "crypto";
+import { generateEsewaSignature, ESEWA_CONFIG } from "../../utils/esewa";
 
 export default defineEventHandler(async (event) => {
     const user = event.context.user;
@@ -68,20 +68,19 @@ export default defineEventHandler(async (event) => {
         });
 
         // 3. Generate eSewa parameters 
-        const productCode = "EPAYTEST";
-        const secretKey = "8gBm/:&EnhH.1/q"; // Standard v2 UAT key
+        const productCode = ESEWA_CONFIG.PRODUCT_CODE;
+        const secretKey = ESEWA_CONFIG.SECRET_KEY;
         const totalAmount = total.toFixed(2);
         const successUrl = `${process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/payment/success`;
         const failureUrl = `${process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/payment/failure`;
 
-        // Signature String format for eSewa v2: 
-        // total_amount=110,transaction_uuid=11-002-33,product_code=EPAYTEST
-        // Ensure no spaces and exact order
-        const message = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`;
-        const signature = crypto
-            .createHmac("sha256", secretKey)
-            .update(message)
-            .digest("base64");
+        const esewaData = {
+            total_amount: totalAmount,
+            transaction_uuid: transactionUuid,
+            product_code: productCode,
+        };
+        const signedFieldNames = "total_amount,transaction_uuid,product_code";
+        const signature = generateEsewaSignature(esewaData, signedFieldNames, secretKey);
 
         return {
             amount: totalAmount,
@@ -93,7 +92,7 @@ export default defineEventHandler(async (event) => {
             product_code: productCode,
             success_url: successUrl,
             failure_url: failureUrl,
-            signed_field_names: "total_amount,transaction_uuid,product_code",
+            signed_field_names: signedFieldNames,
             signature: signature,
         };
     } catch (e: any) {

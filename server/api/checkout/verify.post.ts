@@ -2,7 +2,7 @@ import { defineEventHandler, createError, readBody } from "h3";
 import { db } from "../../utils/drizzle";
 import { orders, cartItems } from "../../db/schema";
 import { eq } from "drizzle-orm";
-import crypto from "crypto";
+import { verifyEsewaSignature } from "../../utils/esewa";
 
 export default defineEventHandler(async (event) => {
     const user = event.context.user;
@@ -35,27 +35,12 @@ export default defineEventHandler(async (event) => {
     const { signature, signed_field_names } = decodedData;
 
     // 2. Verify signature dynamically
-    const secretKey = "8gBm/:&EnhH.1/q";
+    const isValid = verifyEsewaSignature(decodedData);
 
-    // eSewa v2 success response format: field1=val1,field2=val2...
-    const fieldNames = signed_field_names.split(',');
-    const message = fieldNames
-        .map((field: string) => {
-            const value = decodedData[field];
-            return `${field}=${value}`;
-        })
-        .join(',');
-
-    const localSignature = crypto
-        .createHmac("sha256", secretKey)
-        .update(message)
-        .digest("base64");
-
-    if (localSignature !== signature) {
+    if (!isValid) {
         console.error("Signature Mismatch!", {
-            message,
-            localSignature,
-            receivedSignature: signature
+            receivedSignature: signature,
+            signedFieldNames: signed_field_names
         });
         throw createError({ statusCode: 400, message: "Invalid signature" });
     }

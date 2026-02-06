@@ -50,7 +50,7 @@ const handleLogin = async () => {
       <div class="form-group">
         <div class="label-row">
           <label for="password">Password</label>
-          <a href="#" class="forgot-link">Forgot?</a>
+          <!-- <a href="#" class="forgot-link">Forgot?</a> -->
         </div>
         <div class="input-wrapper">
           <input

@@ -53,7 +53,7 @@
             v-model="form.address"
             type="text"
             id="address"
-            placeholder="123 Main St, City, Country"
+            placeholder="Kathmnadu, Baneshwor"
             required
           />
         </div>

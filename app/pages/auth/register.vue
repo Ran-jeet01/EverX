@@ -9,54 +9,62 @@
       <div v-if="error" class="error-message">{{ error }}</div>
       <div class="form-group">
         <label for="name">Full Name</label>
-        <div class="input-wrapper">
+        <div class="input-wrapper" :class="{ 'has-error': errors.name }">
           <input
             v-model="form.name"
             type="text"
             id="name"
             placeholder="John Doe"
             required
+            @input="errors.name = ''"
           />
         </div>
+        <span v-if="errors.name" class="field-error">{{ errors.name }}</span>
       </div>
 
       <div class="form-group">
         <label for="email">Email Address</label>
-        <div class="input-wrapper">
+        <div class="input-wrapper" :class="{ 'has-error': errors.email }">
           <input
             v-model="form.email"
             type="email"
             id="email"
             placeholder="name@example.com"
             required
+            @input="errors.email = ''"
           />
         </div>
+        <span v-if="errors.email" class="field-error">{{ errors.email }}</span>
       </div>
 
       <div class="form-group">
         <label for="password">Password</label>
-        <div class="input-wrapper">
+        <div class="input-wrapper" :class="{ 'has-error': errors.password }">
           <input
             v-model="form.password"
             type="password"
             id="password"
             placeholder="••••••••"
             required
+            @input="errors.password = ''"
           />
         </div>
+        <span v-if="errors.password" class="field-error">{{ errors.password }}</span>
       </div>
 
       <div class="form-group">
         <label for="address">Address</label>
-        <div class="input-wrapper">
+        <div class="input-wrapper" :class="{ 'has-error': errors.address }">
           <input
             v-model="form.address"
             type="text"
             id="address"
             placeholder="Kathmnadu, Baneshwor"
             required
+            @input="errors.address = ''"
           />
         </div>
+        <span v-if="errors.address" class="field-error">{{ errors.address }}</span>
       </div>
 
       <div class="terms">
@@ -83,10 +91,12 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 definePageMeta({
   layout: "auth",
 });
+
+import { registerSchema } from "~/schemas";
 
 const { register } = useAuth();
 const form = reactive({
@@ -98,12 +108,35 @@ const form = reactive({
 const loading = ref(false);
 const error = ref("");
 
+const errors = reactive({
+  name: "",
+  email: "",
+  password: "",
+  address: ""
+});
+
 const handleRegister = async () => {
   loading.value = true;
   error.value = "";
+  // Reset errors
+  Object.keys(errors).forEach(key => errors[key as keyof typeof errors] = "");
+
+  const result = registerSchema.safeParse(form);
+
+  if (!result.success) {
+    loading.value = false;
+    result.error.issues.forEach((issue) => {
+      const field = issue.path[0];
+      if (field && typeof field === 'string' && field in errors) {
+        errors[field as keyof typeof errors] = issue.message;
+      }
+    });
+    return;
+  }
+
   try {
     await register(form);
-  } catch (e) {
+  } catch (e: any) {
     error.value = e.response?._data?.statusMessage || "Registration failed";
   } finally {
     loading.value = false;
@@ -249,5 +282,19 @@ label {
   font-size: 0.9em;
   text-align: center;
   border: 1px solid #fecaca;
+}
+
+.input-wrapper.has-error input {
+  border-color: #ef4444;
+}
+
+.input-wrapper.has-error input:focus {
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+
+.field-error {
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
 }
 </style>

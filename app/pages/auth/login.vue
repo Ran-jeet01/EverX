@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { loginSchema } from "~/schemas";
 definePageMeta({
   layout: "auth",
@@ -12,12 +12,34 @@ const form = reactive({
 const loading = ref(false);
 const error = ref("");
 
+const errors = reactive({
+  email: "",
+  password: ""
+});
+
 const handleLogin = async () => {
   loading.value = true;
   error.value = "";
+  // Reset field errors
+  errors.email = "";
+  errors.password = "";
+
+  const result = loginSchema.safeParse(form);
+
+  if (!result.success) {
+    loading.value = false;
+    result.error.issues.forEach((issue) => {
+      const field = issue.path[0];
+      if (field && typeof field === 'string' && field in errors) {
+        errors[field as keyof typeof errors] = issue.message;
+      }
+    });
+    return;
+  }
+
   try {
     await login(form);
-  } catch (e) {
+  } catch (e: any) {
     error.value = e.response?._data?.statusMessage || "Login failed";
   } finally {
     loading.value = false;
@@ -36,15 +58,17 @@ const handleLogin = async () => {
       <div v-if="error" class="error-message">{{ error }}</div>
       <div class="form-group">
         <label for="email">Email Address</label>
-        <div class="input-wrapper">
+        <div class="input-wrapper" :class="{ 'has-error': errors.email }">
           <input
             v-model="form.email"
             type="email"
             id="email"
             placeholder="name@example.com"
             required
+            @input="errors.email = ''"
           />
         </div>
+        <span v-if="errors.email" class="field-error">{{ errors.email }}</span>
       </div>
 
       <div class="form-group">
@@ -52,15 +76,17 @@ const handleLogin = async () => {
           <label for="password">Password</label>
           <!-- <a href="#" class="forgot-link">Forgot?</a> -->
         </div>
-        <div class="input-wrapper">
+        <div class="input-wrapper" :class="{ 'has-error': errors.password }">
           <input
             v-model="form.password"
             type="password"
             id="password"
             placeholder="••••••••"
             required
+            @input="errors.password = ''"
           />
         </div>
+        <span v-if="errors.password" class="field-error">{{ errors.password }}</span>
       </div>
 
       <button
@@ -187,5 +213,19 @@ label {
   font-size: 0.9em;
   text-align: center;
   border: 1px solid #fecaca;
+}
+
+.input-wrapper.has-error input {
+  border-color: #ef4444;
+}
+
+.input-wrapper.has-error input:focus {
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+
+.field-error {
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
 }
 </style>

@@ -21,6 +21,8 @@ onMounted(async () => {
   try {
     await productsStore.loadProducts("All");
     products.value = productsStore.products;
+
+    console.log(products);
   } catch (error) {
     console.error("Failed to load products:", error);
   } finally {
@@ -91,9 +93,13 @@ onMounted(async () => {
         No products available.
       </div>
 
-      <div
+      <!-- <div
         v-else
         class="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-8"
+      > -->
+      <div
+        v-else
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8 pb-16"
       >
         <ProductCard
           v-for="product in products.slice(0, 6)"

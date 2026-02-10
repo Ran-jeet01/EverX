@@ -50,7 +50,7 @@ const stats = computed(() => [
 
 const series = computed(() => [
   {
-    name: "Active Activity",
+    name: "No of Product",
     data: statsData.value?.salesByMonth ?? [],
   },
 ]);
@@ -104,7 +104,7 @@ const chartOptions = {
     theme: "light",
     y: {
       formatter: function (val: number) {
-        return val + " active";
+        return val + " Product";
       },
     },
   },
@@ -152,13 +152,7 @@ const chartOptions = {
           :style="{ backgroundColor: stat.color }"
         ></div>
 
-        <div class="flex justify-between items-start mb-6">
-          <!-- <div
-              class="p-4 rounded-2xl bg-opacity-10 text-3xl"
-              :style="{ backgroundColor: stat.color + '10' }"
-            >
-              {{ stat.icon }}
-            </div> -->
+        <!-- <div class="flex justify-between items-start mb-6">
           <span
             :class="
               stat.trend === 'up'
@@ -169,7 +163,7 @@ const chartOptions = {
           >
             {{ stat.change }}
           </span>
-        </div>
+        </div> -->
 
         <div>
           <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">

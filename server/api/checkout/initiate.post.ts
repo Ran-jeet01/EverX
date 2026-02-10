@@ -1,6 +1,6 @@
 import { defineEventHandler, createError } from "h3";
 import { db } from "../../utils/drizzle";
-import { orders, orderItems, cartItems, products } from "../../db/schema";
+import { orders, orderItems, cartItems, products, users } from "../../db/schema";
 import { eq } from "drizzle-orm";
 import { generateEsewaSignature, ESEWA_CONFIG } from "../../utils/esewa";
 
@@ -44,13 +44,23 @@ export default defineEventHandler(async (event) => {
 
     try {
         const result = await db.transaction(async (tx) => {
+            // Fetch fresh user data to get address
+            const userResult = await tx
+                .select()
+                .from(users)
+                .where(eq(users.id, user.id))
+                .limit(1);
+
+            const dbUser = userResult[0];
+            const address = dbUser?.address || "Address not provided";
+
             const [newOrder] = await tx
                 .insert(orders)
                 .values({
                     userId: user.id,
                     total: total.toFixed(2),
                     status: "pending",
-                    address: user.address || "Address not provided",
+                    address: address,
                     transactionUuid: transactionUuid,
                 })
                 .returning();

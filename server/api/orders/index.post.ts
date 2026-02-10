@@ -1,6 +1,6 @@
 import { defineEventHandler, createError, readBody } from "h3";
 import { db } from "../../utils/drizzle";
-import { orders, orderItems, cartItems, products } from "../../db/schema";
+import { orders, orderItems, cartItems, products, users } from "../../db/schema";
 import { eq, and } from "drizzle-orm";
 
 export default defineEventHandler(async (event) => {
@@ -47,6 +47,16 @@ export default defineEventHandler(async (event) => {
   // Use transaction
   try {
     const result = await db.transaction(async (tx) => {
+      // Fetch fresh user data
+      const userResult = await tx
+        .select()
+        .from(users)
+        .where(eq(users.id, user.id))
+        .limit(1);
+
+      const dbUser = userResult[0];
+      const address = dbUser?.address || "Address not provided";
+
       // Create Order
       const [newOrder] = await tx
         .insert(orders)
@@ -54,7 +64,7 @@ export default defineEventHandler(async (event) => {
           userId: user.id,
           total: total.toFixed(2),
           status: "pending",
-          address: user.address || "Address not provided", // Fallback
+          address: address,
         })
         .returning();
 

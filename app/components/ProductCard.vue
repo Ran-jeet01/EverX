@@ -26,7 +26,7 @@ const emit = defineEmits<{
       <h3 class="text-lg font-bold mb-4 text-primary -tracking-[0.01em]">
         {{ product.name }}
       </h3>
-      <span class="font-semibold text-slate-500 text-base font-mono">{{
+      <span class="font-medium text-slate-500 text-base font-mono">{{
         product.description
       }}</span>
 

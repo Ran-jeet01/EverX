@@ -16,13 +16,22 @@ interface Product {
   image: string | null;
 }
 
+const categories = ["All", "Hoodie", "Tshirt", "Pant", "Jacket"];
+const selectedCategory = ref("All");
+
 // Fetch products from API
 const {
-  data: products,
+  data: productsData,
   pending,
   error,
   refresh,
-} = await useFetch<Product[]>("/api/products");
+} = await useFetch<any>("/api/products", {
+  query: computed(() => ({
+    category: selectedCategory.value !== "All" ? selectedCategory.value : undefined,
+  })),
+});
+
+const products = computed(() => productsData.value?.products || []);
 
 const isSaving = ref(false);
 const isEditing = ref(false);
@@ -130,10 +139,6 @@ const saveProduct = async () => {
         });
       }
     } else {
-      // Create new - keep using formData if file exists, or JSON?
-      // For simplicity, let's use FormData only if file exists, but creation usually needs an image.
-      // If we made image optional, we could use JSON.
-      // Let's stick to FormData for creation as it likely involves upload.
       await $fetch("/api/products", {
         method: "POST",
         body: formData,
@@ -173,26 +178,56 @@ const deleteProduct = async (id: string) => {
         <p class="text-slate-500">Manage your store listings and stock.</p>
       </div>
 
-      <button
-        @click="toggleForm"
-        class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 md:px-8 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2 w-full md:w-auto justify-center"
-        :disabled="pending"
-      >
-        <svg
-          v-if="!showForm"
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
+      <div class="flex items-center gap-4 w-full md:w-auto">
+        <div class="relative w-full md:w-auto">
+          <select
+            v-model="selectedCategory"
+            class="w-full md:w-auto bg-white border border-cyan-100 text-slate-600 pl-6 pr-12 py-3 rounded-2xl font-bold transition-all shadow-sm focus:ring-2 focus:ring-cyan-500 outline-none appearance-none cursor-pointer min-w-[160px] hover:border-cyan-200"
+          >
+            <option v-for="cat in categories" :key="cat" :value="cat">
+              {{ cat }}
+            </option>
+          </select>
+          <div
+            class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </div>
+        </div>
+
+        <button
+          @click="toggleForm"
+          class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 md:px-8 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2 flex-1 md:flex-none justify-center"
+          :disabled="pending"
         >
-          <path
-            fill-rule="evenodd"
-            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-            clip-rule="evenodd"
-          />
-        </svg>
-        {{ showForm ? "Back to List" : "Add Item" }}
-      </button>
+          <svg
+            v-if="!showForm"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          {{ showForm ? "Back to List" : "Add Item" }}
+        </button>
+      </div>
     </div>
 
     <!-- Loading / Error States -->

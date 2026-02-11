@@ -64,7 +64,6 @@ const getStatusColor = (status: string) => {
   }
 };
 
-console.log(orders.value);
 </script>
 
 <template>

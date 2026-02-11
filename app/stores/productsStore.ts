@@ -4,18 +4,22 @@ import { fetchProducts } from "@/service/products.service";
 import type { ProductResponse, ProductDataType } from "@/types/product";
 
 export const useProductsStore = defineStore("products", () => {
-  // const products = ref<ProductResponse>([]);
   const products = ref<ProductDataType[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
 
-  const loadProducts = async (category?: string) => {
-    // If we already have products and NO category filter is requested, don't refetch
-    if (products.value.length && !category) return;
+  const totalCount = ref(0);
+  const totalPages = ref(0);
+  const currentPage = ref(1);
 
+  const loadProducts = async (category?: string, page: number = 1, limit: number = 9) => {
     loading.value = true;
     try {
-      products.value = await fetchProducts(category);
+      const response = await fetchProducts(category, page, limit);
+      products.value = response.products;
+      totalCount.value = response.totalCount;
+      totalPages.value = response.totalPages;
+      currentPage.value = response.currentPage;
     } catch (err) {
       error.value = "Failed to load products";
     } finally {
@@ -23,5 +27,13 @@ export const useProductsStore = defineStore("products", () => {
     }
   };
 
-  return { products, loading, error, loadProducts };
+  return {
+    products,
+    loading,
+    error,
+    totalCount,
+    totalPages,
+    currentPage,
+    loadProducts
+  };
 });

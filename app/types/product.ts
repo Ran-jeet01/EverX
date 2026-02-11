@@ -17,6 +17,11 @@ interface ReqProduct {
   stock: number;
   description?: string;
 }
-type ProductResponse = ProductDataType[];
+interface ProductResponse {
+  products: ProductDataType[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+}
 
 export type { ProductDataType, ProductResponse, ReqProduct };

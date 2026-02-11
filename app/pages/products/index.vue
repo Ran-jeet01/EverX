@@ -6,33 +6,49 @@ import { useCartStore } from "@/stores/cartStore";
 
 const productsStore = useProductsStore();
 const cartStore = useCartStore();
+const route = useRoute();
+const router = useRouter();
 
 const loading = ref(true);
-const selectedCategory = ref("All");
-
 const categories = ["All", "Hoodie", "Tshirt", "Pant", "Jacket"];
+
+// Read state from URL
+const selectedCategory = computed(() => (route.query.category as string) || "All");
+const currentPage = computed(() => parseInt(route.query.page as string) || 1);
 
 const handleAddToCart = (product: ProductDataType) => {
   cartStore.addToCart(product);
 };
 
-const filterByCategory = async (category: string) => {
-  selectedCategory.value = category;
-  loading.value = true;
-  try {
-    await productsStore.loadProducts(category);
-  } finally {
-    loading.value = false;
+const filterByCategory = (category: string) => {
+  const query: any = { ...route.query, page: 1 };
+  if (category === "All") {
+    delete query.category;
+  } else {
+    query.category = category;
   }
+  router.push({ query });
 };
 
-onMounted(async () => {
-  try {
-    await productsStore.loadProducts("All");
-  } finally {
-    loading.value = false;
-  }
-});
+const changePage = (page: number) => {
+  router.push({
+    query: { ...route.query, page },
+  });
+};
+
+// Watch for route changes to fetch data
+watch(
+  () => [route.query.category, route.query.page],
+  async () => {
+    loading.value = true;
+    try {
+      await productsStore.loadProducts(selectedCategory.value, currentPage.value);
+    } finally {
+      loading.value = false;
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
@@ -68,16 +84,79 @@ onMounted(async () => {
       No products found in this category.
     </div>
 
-    <div
-      v-else
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 pb-16"
-    >
-      <ProductCard
-        v-for="product in productsStore.products"
-        :key="product.id"
-        :product="product"
-        @add-to-cart="handleAddToCart"
-      />
+    <div v-else>
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 pb-16"
+      >
+        <ProductCard
+          v-for="product in productsStore.products"
+          :key="product.id"
+          :product="product"
+          @add-to-cart="handleAddToCart"
+        />
+      </div>
+
+      <!-- Pagination UI -->
+      <div
+        v-if="productsStore.totalPages > 1"
+        class="flex justify-center items-center gap-2 pb-16"
+      >
+        <button
+          @click="changePage(currentPage - 1)"
+          :disabled="currentPage === 1"
+          class="p-2 rounded-md border border-slate-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+        </button>
+
+        <div class="flex items-center gap-1">
+          <button
+            v-for="page in productsStore.totalPages"
+            :key="page"
+            @click="changePage(page)"
+            class="w-10 h-10 rounded-md border text-sm font-medium transition-all duration-200"
+            :class="[
+              currentPage === page
+                ? 'bg-black text-white border-black'
+                : 'bg-white text-slate-600 border-slate-200 hover:border-black hover:text-black',
+            ]"
+          >
+            {{ page }}
+          </button>
+        </div>
+
+        <button
+          @click="changePage(currentPage + 1)"
+          :disabled="currentPage === productsStore.totalPages"
+          class="p-2 rounded-md border border-slate-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 </template>

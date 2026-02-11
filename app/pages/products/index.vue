@@ -43,6 +43,8 @@ watch(
     loading.value = true;
     try {
       await productsStore.loadProducts(selectedCategory.value, currentPage.value);
+      // Scroll to top if  page index change
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       loading.value = false;
     }

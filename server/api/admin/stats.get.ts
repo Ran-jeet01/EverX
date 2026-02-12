@@ -17,20 +17,19 @@ export default defineEventHandler(async (event) => {
     }
     const totalUsers = Number(userStats.count);
 
-    const productsRaw = await $fetch("/api/products");
-    const totalProducts = (productsRaw as any[]).length;
-    // for total numbe of Ordered product
-    // const [orderedProduct] = await db
-    //   .select({ count: sql<number>`count(*)` })
-    //   .from(orderItems);
-    // const totalOrderedProduct = Number(orderedProduct.count);
-    // // total revenue
+    // 2. Get Product Count
+    const [productStats] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(products);
+    const totalProducts = Number(productStats?.count || 0);
+
+    // 3. Get Total Revenue
     const [rev] = await db
       .select({
-        totalRevenue: sql<number>`SUM(${orderItems.quantity} * ${orderItems.price})`,
+        totalRevenue: sql<number>`COALESCE(SUM(${orderItems.quantity} * ${orderItems.price}), 0)`,
       })
       .from(orderItems);
-    const revenue = rev.totalRevenue;
+    const revenue = Number(rev?.totalRevenue || 0);
     // data for NO of product sold each month
     const year = new Date().getFullYear();
 

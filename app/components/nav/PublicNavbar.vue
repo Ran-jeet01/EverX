@@ -50,12 +50,13 @@ watch(() => route.path, close);
       </div>
 
       <!-- Center side onlyy Logo -->
-      <NuxtLink
-        to="/"
-        class="text-2xl text-white flex items-center justify-center gap-2"
-      >
-        Ever
-        <img src="~/assets/khu.png" class="h-[38px] w-auto" alt="Ever logo" />
+      <NuxtLink to="/" class="logo-container group">
+        <span class="logo-text text-white">Ever</span>
+        <img
+          src="~/assets/khu.png"
+          class="h-9 w-auto object-contain brightness-0 invert transition-transform duration-300 group-hover:rotate-12"
+          alt="Ever logo"
+        />
       </NuxtLink>
 
       <!-- Right side  About and Cart) -->

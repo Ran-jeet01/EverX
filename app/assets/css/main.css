@@ -163,6 +163,7 @@
 }
 
 @layer components {
+
   /* Your existing components */
   .container {
     @apply max-w-container mx-auto px-6;
@@ -219,17 +220,33 @@
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(
-      circle,
-      rgba(255, 255, 255, 0.1) 0%,
-      transparent 60%
-    );
+    background: radial-gradient(circle,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 60%);
     opacity: 0;
     transition: opacity 0.3s;
   }
 
   .highlight-glow:hover::after {
     opacity: 1;
+  }
+
+  /* Logo Styles */
+  .logo-container {
+    @apply flex items-center justify-center gap-2.5 transition-all duration-300;
+  }
+
+  .logo-container:hover {
+    @apply opacity-90 scale-[1.02];
+  }
+
+  .logo-text {
+    @apply text-3xl font-bold tracking-tighter uppercase;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .logo-text span {
+    @apply text-accent;
   }
 }
 
@@ -248,6 +265,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -259,6 +277,7 @@
     transform: translateX(-20px);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;

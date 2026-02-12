@@ -109,8 +109,13 @@ export const useCartStore = defineStore("cart", () => {
   };
 
   const clearCart = async () => {
-    for (const item of rawItems.value) {
-      await removeFromCart(item.id);
+    try {
+      await $fetch("/api/cart", {
+        method: "DELETE",
+      });
+      await loadCart();
+    } catch (e) {
+      console.error("Failed to clear cart", e);
     }
   };
 

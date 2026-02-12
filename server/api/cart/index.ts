@@ -73,18 +73,21 @@ export default defineEventHandler(async (event) => {
 
     if (method === 'DELETE') {
         const query = getQuery(event);
-        const id = Number(query.id);
+        const id = query.id ? Number(query.id) : null;
 
-        // Verify ownership
-        const [firstItem] = await db.select().from(cartItems).where(eq(cartItems.id, id)).limit(1);
-        if (!firstItem || firstItem.userId !== userId) {
-            // If item doesn't exist, we can just return success or 404, but ownership check is key.
-            // If item not found, 404 is appropriate.
-            if (!firstItem) throw createError({ statusCode: 404, message: 'Not found' });
-            throw createError({ statusCode: 403, message: 'Forbidden' });
+        if (id) {
+            // Verify ownership for single item deletion
+            const [firstItem] = await db.select().from(cartItems).where(eq(cartItems.id, id)).limit(1);
+            if (!firstItem || firstItem.userId !== userId) {
+                if (!firstItem) throw createError({ statusCode: 404, message: 'Not found' });
+                throw createError({ statusCode: 403, message: 'Forbidden' });
+            }
+            await db.delete(cartItems).where(eq(cartItems.id, id));
+        } else {
+            // Clear all items for the user
+            await db.delete(cartItems).where(eq(cartItems.userId, userId));
         }
 
-        await db.delete(cartItems).where(eq(cartItems.id, id));
         return { success: true };
     }
 });

@@ -21,9 +21,13 @@ const quickLinks = [
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-6">
         <!-- Brand Section -->
         <div class="flex flex-col gap-3">
-          <NuxtLink to="/" class="flex items-center gap-2">
-            <span class="text-3xl font-bold tracking-tight">Ever</span>
-            <img src="~/assets/khu.png" class="h-10 w-auto" alt="Ever logo" />
+          <NuxtLink to="/" class="logo-container group">
+            <span class="logo-text">Ever</span>
+            <img
+              src="~/assets/khu.png"
+              class="h-9 w-auto object-contain brightness-0 invert transition-transform duration-300 group-hover:rotate-12"
+              alt="Ever logo"
+            />
           </NuxtLink>
           <p class="text-gray-400 leading-relaxed max-w-sm text-sm">
             Elevating your lifestyle with premium quality products.

@@ -1,14 +1,9 @@
 import crypto from "crypto";
 
-export const ESEWA_CONFIG = {
-  PRODUCT_CODE: "EPAYTEST",
-  SECRET_KEY: "8gBm/:&EnhH.1/q", // Standard v2 UAT key
-};
-
 export function generateEsewaSignature(
   data: Record<string, any>,
   signedFieldNames: string,
-  secretKey: string = ESEWA_CONFIG.SECRET_KEY,
+  secretKey: string,
 ): string {
   const fieldNames = signedFieldNames.split(",");
   const message = fieldNames
@@ -26,7 +21,7 @@ export function generateEsewaSignature(
 
 export function verifyEsewaSignature(
   data: Record<string, any>,
-  secretKey: string = ESEWA_CONFIG.SECRET_KEY,
+  secretKey: string,
 ): boolean {
   const { signature, signed_field_names } = data;
   if (!signature || !signed_field_names) return false;

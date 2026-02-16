@@ -8,6 +8,11 @@ export default defineNuxtConfig({
     CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+    smtpEmail: process.env.NUXT_SMTP_EMAIL,
+    smtpPass: process.env.NUXT_SMTP_PASS,
+    esewaProductCode: process.env.NUXT_ESEWA_PRODUCT_CODE,
+    esewaSecretKey: process.env.NUXT_ESEWA_SECRET_KEY,
+    esewaUrl: process.env.NUXT_ESEWA_URL,
   },
   css: ["~/assets/css/main.css"],
   app: {

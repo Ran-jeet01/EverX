@@ -35,7 +35,8 @@ export default defineEventHandler(async (event) => {
     const { signature, signed_field_names } = decodedData;
 
     // 2. Verify signature dynamically
-    const isValid = verifyEsewaSignature(decodedData);
+    const config = useRuntimeConfig();
+    const isValid = verifyEsewaSignature(decodedData, config.esewaSecretKey);
 
     if (!isValid) {
         console.error("Signature Mismatch!", {

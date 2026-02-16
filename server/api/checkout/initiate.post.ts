@@ -2,7 +2,7 @@ import { defineEventHandler, createError } from "h3";
 import { db } from "../../utils/drizzle";
 import { orders, orderItems, cartItems, products, users } from "../../db/schema";
 import { eq } from "drizzle-orm";
-import { generateEsewaSignature, ESEWA_CONFIG } from "../../utils/esewa";
+import { generateEsewaSignature } from "../../utils/esewa";
 
 export default defineEventHandler(async (event) => {
     const user = event.context.user;
@@ -78,8 +78,9 @@ export default defineEventHandler(async (event) => {
         });
 
         // 3. Generate eSewa parameters 
-        const productCode = ESEWA_CONFIG.PRODUCT_CODE;
-        const secretKey = ESEWA_CONFIG.SECRET_KEY;
+        const config = useRuntimeConfig();
+        const productCode = config.esewaProductCode;
+        const secretKey = config.esewaSecretKey;
         const totalAmount = total.toFixed(2);
         const successUrl = `${process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/payment/success`;
         const failureUrl = `${process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/payment/failure`;
@@ -104,6 +105,7 @@ export default defineEventHandler(async (event) => {
             failure_url: failureUrl,
             signed_field_names: signedFieldNames,
             signature: signature,
+            esewa_url: config.esewaUrl, // Added for frontend flexibility
         };
     } catch (e: any) {
         console.error("eSewa initiation failed:", e);

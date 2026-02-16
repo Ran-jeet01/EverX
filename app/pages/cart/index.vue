@@ -40,7 +40,7 @@ const handleCheckout = async () => {
         // Create a hidden form and submit it to eSewa
         const form = document.createElement('form');
         form.setAttribute('method', 'POST');
-        form.setAttribute('action', 'https://rc-epay.esewa.com.np/api/epay/main/v2/form');
+        form.setAttribute('action', response.esewa_url);
 
         for (const key in response) {
             if (key === 'order_id') continue; // Don't send internal order_id to eSewa

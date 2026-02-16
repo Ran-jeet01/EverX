@@ -1,30 +1,28 @@
 <script setup lang="ts">
-import { loginSchema } from "~/schemas";
+import { forgotPasswordSchema } from "~/schemas";
+
 definePageMeta({
   layout: "auth",
 });
 
-const { login } = useAuth();
 const form = reactive({
   email: "",
-  password: "",
 });
 const loading = ref(false);
+const message = ref("");
 const error = ref("");
 
 const errors = reactive({
   email: "",
-  password: ""
 });
 
-const handleLogin = async () => {
+const handleForgotPassword = async () => {
   loading.value = true;
   error.value = "";
-  // Reset field errors
+  message.value = "";
   errors.email = "";
-  errors.password = "";
 
-  const result = loginSchema.safeParse(form);
+  const result = forgotPasswordSchema.safeParse(form);
 
   if (!result.success) {
     loading.value = false;
@@ -38,9 +36,13 @@ const handleLogin = async () => {
   }
 
   try {
-    await login(form);
+    const response = await $fetch<{ message: string }>("/api/auth/forgot-password", {
+      method: "POST",
+      body: form,
+    });
+    message.value = response.message;
   } catch (e: any) {
-    error.value = e.response?._data?.statusMessage || "Login failed";
+    error.value = e.response?._data?.statusMessage || "Something went wrong";
   } finally {
     loading.value = false;
   }
@@ -48,14 +50,15 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="login-page">
+  <div class="forgot-password-page">
     <div class="header">
-      <h1>Welcome Back</h1>
-      <p>Enter your credentials to access your account</p>
+      <h1>Forgot Password?</h1>
+      <p>Enter your email and we'll send you a link to reset your password.</p>
     </div>
 
-    <form @submit.prevent="handleLogin" class="auth-form">
+    <form @submit.prevent="handleForgotPassword" class="auth-form" v-if="!message">
       <div v-if="error" class="error-message">{{ error }}</div>
+      
       <div class="form-group">
         <label for="email">Email Address</label>
         <div class="input-wrapper" :class="{ 'has-error': errors.email }">
@@ -71,32 +74,24 @@ const handleLogin = async () => {
         <span v-if="errors.email" class="field-error">{{ errors.email }}</span>
       </div>
 
-      <div class="form-group">
-        <div class="label-row">
-          <label for="password">Password</label>
-          <NuxtLink to="/auth/forgot-password" class="forgot-link">Forgot?</NuxtLink>
-        </div>
-        <div class="input-wrapper" :class="{ 'has-error': errors.password }">
-          <input
-            v-model="form.password"
-            type="password"
-            id="password"
-            placeholder="••••••••"
-            required
-            @input="errors.password = ''"
-          />
-        </div>
-        <span v-if="errors.password" class="field-error">{{ errors.password }}</span>
-      </div>
-
       <button
         type="submit"
         class="submit-btn highlight-glow"
         :disabled="loading"
       >
-        {{ loading ? "Signing In..." : "Sign In" }}
+        {{ loading ? "Sending..." : "Send Reset Link" }}
       </button>
+
+      <div class="footer-links">
+        <NuxtLink to="/auth/login" class="back-link">Back to Login</NuxtLink>
+      </div>
     </form>
+
+    <div v-else class="success-container">
+      <div class="success-icon">✓</div>
+      <p class="success-message">{{ message }}</p>
+      <NuxtLink to="/auth/login" class="submit-btn text-center">Back to Login</NuxtLink>
+    </div>
   </div>
 </template>
 
@@ -130,21 +125,10 @@ const handleLogin = async () => {
   gap: 0.5rem;
 }
 
-.label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 label {
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text-secondary);
-}
-
-.forgot-link {
-  font-size: 0.8rem;
-  color: var(--primary);
 }
 
 .input-wrapper input {
@@ -173,6 +157,8 @@ label {
   font-weight: 700;
   font-size: 1rem;
   box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+  display: block;
+  text-decoration: none;
 }
 
 .submit-btn:hover {
@@ -180,29 +166,24 @@ label {
   transform: translateY(-1px);
 }
 
-.highlight-glow {
-  position: relative;
-  overflow: hidden;
+.text-center {
+  text-align: center;
 }
 
-.highlight-glow::after {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.1) 0%,
-    transparent 60%
-  );
-  opacity: 0;
-  transition: opacity 0.3s;
+.footer-links {
+  margin-top: 1.5rem;
+  text-align: center;
 }
 
-.highlight-glow:hover::after {
-  opacity: 1;
+.back-link {
+  font-size: 0.9rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.back-link:hover {
+  text-decoration: underline;
 }
 
 .error-message {
@@ -219,13 +200,36 @@ label {
   border-color: #ef4444;
 }
 
-.input-wrapper.has-error input:focus {
-  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
-}
-
 .field-error {
   color: #ef4444;
   font-size: 0.8rem;
   margin-top: 0.25rem;
+}
+
+.success-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.success-icon {
+  width: 60px;
+  height: 60px;
+  background-color: #10b981;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+}
+
+.success-message {
+  color: var(--text-primary);
+  text-align: center;
+  font-weight: 500;
 }
 </style>

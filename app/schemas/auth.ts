@@ -30,5 +30,21 @@ export const registerSchema = z.object({
     .max(200, { message: "Address is too long" }),
 });
 
+// Forgot Password Schema
+export const forgotPasswordSchema = z.object({
+  email: emailSchema,
+});
+
+// Reset Password Schema
+export const resetPasswordSchema = z.object({
+  password: passwordSchema,
+  confirmPassword: passwordSchema,
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;

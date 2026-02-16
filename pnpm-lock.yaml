@@ -47,9 +47,6 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.3
         version: 9.0.3
-      mailtrap:
-        specifier: ^4.4.0
-        version: 4.4.0(@types/nodemailer@7.0.10)(nodemailer@8.0.1)
       nodemailer:
         specifier: ^8.0.1
         version: 8.0.1
@@ -2976,18 +2973,6 @@ packages:
 
   magicast@0.5.1:
     resolution: {integrity: sha512-xrHS24IxaLrvuo613F719wvOIv9xPHFWQHuvGUBmPnCA/3MQxKI3b+r7n1jAoDHmsbC5bRhTZYR77invLAxVnw==}
-
-  mailtrap@4.4.0:
-    resolution: {integrity: sha512-HAUAUJRVr0oXzipnnJErvHqmlUJ159icD1R9u9vHNFMNM16Buh2BfakKOi/TXBhk8ihkntH2Q5JSG7sphPNRMA==}
-    engines: {node: '>=16.20.1', yarn: '>=1.22.17'}
-    peerDependencies:
-      '@types/nodemailer': ^6.4.9
-      nodemailer: ^7.0.7
-    peerDependenciesMeta:
-      '@types/nodemailer':
-        optional: true
-      nodemailer:
-        optional: true
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -7344,15 +7329,6 @@ snapshots:
       '@babel/parser': 7.28.6
       '@babel/types': 7.28.6
       source-map-js: 1.2.1
-
-  mailtrap@4.4.0(@types/nodemailer@7.0.10)(nodemailer@8.0.1):
-    dependencies:
-      axios: 1.13.2
-    optionalDependencies:
-      '@types/nodemailer': 7.0.10
-      nodemailer: 8.0.1
-    transitivePeerDependencies:
-      - debug
 
   math-intrinsics@1.1.0: {}
 

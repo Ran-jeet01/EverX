@@ -11,6 +11,7 @@ const form = reactive({
 });
 const loading = ref(false);
 const error = ref("");
+const showPassword = ref(false);
 
 const errors = reactive({
   email: "",
@@ -71,23 +72,33 @@ const handleLogin = async () => {
         <span v-if="errors.email" class="field-error">{{ errors.email }}</span>
       </div>
 
+
       <div class="form-group">
         <div class="label-row">
           <label for="password">Password</label>
           <NuxtLink to="/auth/forgot-password" class="forgot-link">Forgot?</NuxtLink>
         </div>
-        <div class="input-wrapper" :class="{ 'has-error': errors.password }">
+        <div class="input-wrapper password-wrapper" :class="{ 'has-error': errors.password }">
           <input
             v-model="form.password"
-            type="password"
+            :type="showPassword ? 'text' : 'password'"
             id="password"
             placeholder="••••••••"
             required
             @input="errors.password = ''"
           />
+          <button
+            type="button"
+            class="password-toggle"
+            @click="showPassword = !showPassword"
+            aria-label="Toggle password visibility"
+          >
+            <Icon :name="showPassword ? 'ri:eye-off-line' : 'ri:eye-line'" size="20" />
+          </button>
         </div>
         <span v-if="errors.password" class="field-error">{{ errors.password }}</span>
       </div>
+
 
       <button
         type="submit"
@@ -162,6 +173,34 @@ label {
   border-color: var(--primary);
   background: #ffffff;
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 45px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.password-toggle:hover {
+  color: var(--primary);
 }
 
 .submit-btn {

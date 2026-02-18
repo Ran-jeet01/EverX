@@ -1,8 +1,10 @@
-import { users } from "../../db/schema";
+import { users, pendingRegistrations } from "../../db/schema";
 import { db } from "../../utils/drizzle";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import crypto from "crypto";
+import { sendVerificationEmail } from "../../utils/mailer";
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -40,32 +42,54 @@ export default defineEventHandler(async (event) => {
 
   // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
+  const token = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
 
-  // Create user
-  // Role defaults to 'user' in schema, so we don't need to specify it unless we want to force it
-  const newUser = await db
-    .insert(users)
-    .values({
-      email,
-      password: hashedPassword,
-      name,
-      address,
-      role: "user", // Explicitly setting it as requested
-    })
-    .returning();
+  // Check if pending registration exists
+  const existingPending = await db
+    .select()
+    .from(pendingRegistrations)
+    .where(eq(pendingRegistrations.email, email))
+    .limit(1);
 
-  const user = newUser[0];
-  if (!user) {
+  if (existingPending.length > 0) {
+    // Update existing pending registration
+    await db
+      .update(pendingRegistrations)
+      .set({
+        password: hashedPassword,
+        name,
+        address,
+        token,
+        expiresAt,
+        createdAt: new Date(),
+      })
+      .where(eq(pendingRegistrations.email, email));
+  } else {
+    // Create users
+    await db
+      .insert(pendingRegistrations)
+      .values({
+        email,
+        password: hashedPassword,
+        name,
+        address,
+        role: "user",
+        token,
+        expiresAt,
+      });
+  }
+
+  // Send verification email
+  const emailSent = await sendVerificationEmail(email, token);
+  if (!emailSent) {
     throw createError({
       statusCode: 500,
-      message: "Failed to create user",
+      statusMessage: "Failed to send verification email",
     });
   }
 
   return {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
+    message: "Registration successful. Please check your email to verify your account.",
   };
 });

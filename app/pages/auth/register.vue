@@ -1,11 +1,22 @@
 <template>
   <div class="register-page">
     <div class="header">
-      <h1>Create Account</h1>
-      <p>Join us today! It only takes a minute.</p>
+      <h1 v-if="!success">Create Account</h1>
+      <p v-if="!success">Join us today! It only takes a minute.</p>
     </div>
 
-    <form @submit.prevent="handleRegister" class="auth-form">
+    <div v-if="success" class="success-message">
+      <div class="success-icon">
+        <Icon name="ri:mail-send-line" size="64" />
+      </div>
+      <h2>Check Your Email</h2>
+      <p>{{ successMessage }}</p>
+      <NuxtLink to="/auth/login" class="login-link">
+        Go to Login
+      </NuxtLink>
+    </div>
+
+    <form v-if="!success" @submit.prevent="handleRegister" class="auth-form">
       <div v-if="error" class="error-message">{{ error }}</div>
       <div class="form-group">
         <label for="name">Full Name</label>
@@ -115,6 +126,8 @@ const form = reactive({
 });
 const loading = ref(false);
 const error = ref("");
+const success = ref(false);
+const successMessage = ref("");
 const showPassword = ref(false);
 
 const errors = reactive({
@@ -144,7 +157,16 @@ const handleRegister = async () => {
   }
 
   try {
-    await register(form);
+    const response: any = await register(form);
+    success.value = true;
+    successMessage.value = response?.message || "Registration successful! Please check your email.";
+    
+    // Clear form
+    form.name = "";
+    form.email = "";
+    form.password = "";
+    form.address = "";
+
   } catch (e: any) {
     error.value = e.response?._data?.statusMessage || "Registration failed";
   } finally {
@@ -333,5 +355,51 @@ label {
   color: #ef4444;
   font-size: 0.8rem;
   margin-top: 0.25rem;
+}
+
+.success-message {
+  text-align: center;
+  padding: 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s ease;
+}
+
+.success-icon {
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.success-message h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.success-message p {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.login-link {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: var(--primary);
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.login-link:hover {
+  background-color: var(--primary-hover);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 </style>

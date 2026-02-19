@@ -43,12 +43,10 @@ export const useAuth = () => {
 
   const register = async (credentials: LoginCredentials) => {
     try {
-      await $fetch("/api/auth/register", {
+      return await $fetch("/api/auth/register", {
         method: "POST",
         body: credentials,
       });
-
-      router.push("/auth/login");
     } catch (error) {
       console.error("Registration failed", error);
       throw error;

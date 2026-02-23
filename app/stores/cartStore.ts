@@ -122,6 +122,18 @@ export const useCartStore = defineStore("cart", () => {
     }
   };
 
+  // Initial load
+  loadCart();
+
+  // Watch for auth changes
+  watch(user, (newUser) => {
+    if (newUser) {
+      loadCart();
+    } else {
+      rawItems.value = [];
+    }
+  }, { immediate: true });
+
   return {
     items,
     rawItems,

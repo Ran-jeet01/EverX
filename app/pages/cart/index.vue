@@ -16,7 +16,7 @@ console.log(cartItems.value);
 const checkoutLoading = ref(false);
 const router = useRouter();
 
-cartStore.loadCart();
+
 const { user } = useAuth();
 
 const handleCheckout = async () => {

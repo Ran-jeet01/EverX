@@ -16,51 +16,50 @@ console.log(cartItems.value);
 const checkoutLoading = ref(false);
 const router = useRouter();
 
-onMounted(async () => {
-    await cartStore.loadCart();
-});
-
+cartStore.loadCart();
 const { user } = useAuth();
 
 const handleCheckout = async () => {
-    if (cartItems.value.length === 0) return;
-    
-    // Check if user has address
-    if (!user.value?.address) {
-        alert('Please add a shipping address to your profile before checking out.');
-        router.push('/account/profile');
-        return;
+  if (cartItems.value.length === 0) return;
+
+  // Check if user has address
+  if (!user.value?.address) {
+    alert("Please add a shipping address to your profile before checking out.");
+    router.push("/account/profile");
+    return;
+  }
+
+  checkoutLoading.value = true;
+  try {
+    // Initiate eSewa payment
+    const response: any = await $fetch("/api/checkout/initiate", {
+      method: "POST",
+    });
+
+    // Create a hidden form and submit it to eSewa
+    const form = document.createElement("form");
+    form.setAttribute("method", "POST");
+    form.setAttribute("action", response.esewa_url);
+
+    for (const key in response) {
+      if (key === "order_id") continue; // Don't send internal order_id to eSewa
+      const hiddenField = document.createElement("input");
+      hiddenField.setAttribute("type", "hidden");
+      hiddenField.setAttribute("name", key);
+      hiddenField.setAttribute("value", response[key]);
+      form.appendChild(hiddenField);
     }
 
-    checkoutLoading.value = true;
-    try {
-        // Initiate eSewa payment
-        const response: any = await $fetch('/api/checkout/initiate', { method: 'POST' });
-        
-        // Create a hidden form and submit it to eSewa
-        const form = document.createElement('form');
-        form.setAttribute('method', 'POST');
-        form.setAttribute('action', response.esewa_url);
-
-        for (const key in response) {
-            if (key === 'order_id') continue; // Don't send internal order_id to eSewa
-            const hiddenField = document.createElement('input');
-            hiddenField.setAttribute('type', 'hidden');
-            hiddenField.setAttribute('name', key);
-            hiddenField.setAttribute('value', response[key]);
-            form.appendChild(hiddenField);
-        }
-
-        document.body.appendChild(form);
-        form.submit();
-    } catch (e: any) {
-        alert(e.data?.message || 'Checkout failed');
-        if (e.statusCode === 401) {
-             router.push('/auth/login');
-        }
-    } finally {
-        // We don't set loading to false here because we're redirecting
+    document.body.appendChild(form);
+    form.submit();
+  } catch (e: any) {
+    alert(e.data?.message || "Checkout failed");
+    if (e.statusCode === 401) {
+      router.push("/auth/login");
     }
+  } finally {
+    // We don't set loading to false here because we're redirecting
+  }
 };
 </script>
 
@@ -145,7 +144,7 @@ const handleCheckout = async () => {
           :disabled="checkoutLoading"
           class="btn btn-primary w-full mt-6 flex justify-center py-4 bg-[#60bb46] text-white font-bold hover:bg-[#50a03a] disabled:bg-gray-400"
         >
-          {{ checkoutLoading ? 'Processing...' : 'Pay with eSewa' }}
+          {{ checkoutLoading ? "Processing..." : "Pay with eSewa" }}
         </button>
       </div>
     </div>

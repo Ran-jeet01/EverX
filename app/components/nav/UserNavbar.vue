@@ -19,6 +19,7 @@ const solidNav = computed(
 );
 
 const count = computed(() => cart.items?.length || 0);
+console.log(count.value + "THis");
 
 const toggle = () => (open.value = !open.value);
 const close = () => (open.value = false);

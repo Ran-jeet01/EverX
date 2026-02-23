@@ -3,6 +3,9 @@ import { useProductsStore } from "./productsStore";
 
 export const useCartStore = defineStore("cart", () => {
   const productsStore = useProductsStore();
+  const { user } = useAuth();
+  const { success } = useToast();
+  const headers = useRequestHeaders(["cookie"]);
   const rawItems = ref<any[]>([]);
 
   const items = computed(() => {
@@ -34,13 +37,12 @@ export const useCartStore = defineStore("cart", () => {
         await productsStore.loadProducts();
       }
 
-      const { user } = useAuth();
       if (!user.value) {
         rawItems.value = [];
         return;
       }
 
-      const data = await $fetch("/api/cart");
+      const data = await $fetch("/api/cart", { headers });
       rawItems.value = data as any[];
     } catch (e) {
       console.error("Failed to load cart", e);
@@ -48,9 +50,6 @@ export const useCartStore = defineStore("cart", () => {
   };
 
   const addToCart = async (product: any) => {
-    const { user } = useAuth();
-    const { success } = useToast();
-
     if (!user.value) {
       navigateTo("/auth/login");
       return;
@@ -60,6 +59,7 @@ export const useCartStore = defineStore("cart", () => {
       await $fetch("/api/cart", {
         method: "POST",
         body: { productId: product.id, quantity: 1 },
+        headers,
       });
       success("Added to cart");
       await loadCart();
@@ -72,6 +72,7 @@ export const useCartStore = defineStore("cart", () => {
     try {
       await $fetch(`/api/cart?id=${id}`, {
         method: "DELETE",
+        headers,
       });
       await loadCart();
     } catch (e) {
@@ -101,6 +102,7 @@ export const useCartStore = defineStore("cart", () => {
       await $fetch("/api/cart", {
         method: "PUT",
         body: { id, quantity: newQuantity },
+        headers,
       });
       await loadCart();
     } catch (e) {
@@ -112,6 +114,7 @@ export const useCartStore = defineStore("cart", () => {
     try {
       await $fetch("/api/cart", {
         method: "DELETE",
+        headers,
       });
       await loadCart();
     } catch (e) {
